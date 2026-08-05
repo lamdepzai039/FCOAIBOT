@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dây Mồi Calculator</title>
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --bg1:#241a3a; --bg2:#0d0b17; --bg3:#08070f;
+    --text-main:#f0f0f5; --text-muted:#9d94b8; --text-faint:#6a628a;
+    --card-bg: rgba(30,25,54,0.55); --card-border: rgba(255,255,255,0.08);
+    --input-bg: rgba(20,16,31,0.7); --input-border: rgba(255,255,255,0.08);
+    --pill-bg: rgba(32,26,56,0.6); --pill-border: rgba(255,255,255,0.08); --pill-text:#b9b0d6;
+    --note-bg: rgba(23,18,38,0.6); --note-border: rgba(255,255,255,0.06);
+    --table-th-bg: rgba(32,26,56,0.6); --table-border: rgba(255,255,255,0.06); --table-even: rgba(255,255,255,0.02);
+  }
+  body.theme-light {
+    --bg1:#eef0ff; --bg2:#f7f7fb; --bg3:#ffffff;
+    --text-main:#211c33; --text-muted:#5b5473; --text-faint:#8b84a3;
+    --card-bg: rgba(255,255,255,0.65); --card-border: rgba(30,25,54,0.1);
+    --input-bg: rgba(255,255,255,0.85); --input-border: rgba(30,25,54,0.14);
+    --pill-bg: rgba(255,255,255,0.75); --pill-border: rgba(30,25,54,0.14); --pill-text:#4a4468;
+    --note-bg: rgba(255,255,255,0.6); --note-border: rgba(30,25,54,0.08);
+    --table-th-bg: rgba(255,255,255,0.75); --table-border: rgba(30,25,54,0.08); --table-even: rgba(30,25,54,0.03);
+  }
+  body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: radial-gradient(circle at 20% 0%, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 100%);
+    color: var(--text-main); margin: 0; padding: 24px; min-height: 100vh;
+    transition: background .3s ease, color .3s ease;
+  }
+
+  #deviceChooser {
+    position: fixed; inset: 0; background: rgba(8,7,15,.97); backdrop-filter: blur(8px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; z-index: 999; padding: 24px; text-align: center;
+  }
+  #deviceChooser h1 { font-size: 20px; color: #cbb8ff; margin: 0 0 2px; }
+  #deviceChooser p { font-size: 13px; color: #9d94b8; margin: 0 0 14px; }
+  .device-btn {
+    width: 240px; padding: 18px; border-radius: 14px;
+    background: linear-gradient(135deg,#201a38,#171226); border: 1px solid rgba(255,255,255,.08);
+    color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; transition: .2s;
+  }
+  .device-btn:hover { border-color: #7d5fe0; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,90,224,.25); }
+  .device-btn .sub { display: block; font-size: 11px; color: #9d94b8; font-weight: 400; margin-top: 4px; }
+
+  .wrap { display: none; flex-direction: column; gap: 16px; max-width: 480px; margin: auto; }
+  @media (min-width: 700px) { .wrap { max-width: 650px; } }
+  @media (min-width: 1024px) { .wrap { max-width: 800px; } }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 2px 2px 0; }
+  .topbar-title { font-weight: 800; font-size: 15px; color: var(--text-main); }
+  .topbar-controls { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 10px; background: var(--pill-bg); border: 1px solid var(--pill-border);
+    cursor: pointer; font-size: 16px; color: var(--text-main); transition: transform .15s;
+  }
+  .icon-btn:active { transform: scale(.9); }
+
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .card {
+    background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border); border-radius: 18px; padding: 20px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
+    animation: fadeSlideUp .5s ease both; transition: box-shadow .4s ease, background .3s ease, border-color .3s ease;
+  }
+  .card h2 { margin: 0 0 14px; font-size: 15px; display: flex; align-items: center; gap: 8px; color: #cbb8ff; }
+  .note {
+    font-size: 12px; color: var(--text-muted); background: var(--note-bg); border: 1px solid var(--note-border);
+    border-radius: 10px; padding: 10px 12px; line-height: 1.6;
+  }
+
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    flex: 1; min-width: 54px; text-align: center; padding: 10px 0; border-radius: 12px;
+    background: var(--pill-bg); border: 1px solid var(--pill-border); color: var(--pill-text); font-weight: 700;
+    cursor: pointer; transition: all .15s;
+  }
+  .pill:hover { border-color: #6c4fd1; }
+  .pill.active { background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; border-color: transparent;
+    box-shadow: 0 4px 14px rgba(124,90,224,.45); }
+
+  input#chainInput {
+    width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--input-border);
+    background: var(--input-bg); color: var(--text-main); font-size: 20px; letter-spacing: 2px; text-align: center;
+    font-weight: 700; font-family: 'JetBrains Mono', 'Consolas', 'SFMono-Regular', monospace;
+  }
+  input#chainInput:focus { outline: none; border-color: #7d5fe0; box-shadow: 0 0 0 3px rgba(124,90,224,.2); }
+
+  .input-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .input-actions .mini-btn { flex: 1; text-align: center; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; justify-content: center; }
+  .digit-chip {
+    width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; color: #fff;
+    font-family: 'JetBrains Mono', 'Consolas', 'SFMono-Regular', monospace;
+    box-shadow: 0 4px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  @keyframes popIn { from { opacity: 0; transform: scale(.4) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .digit-chip.chip-new { animation: popIn .35s cubic-bezier(.34,1.56,.64,1) both; }
+  .d-up   { background: linear-gradient(160deg,#2fbf83,#1f8f61); }
+  .d-neu  { background: linear-gradient(160deg,#e0a83f,#b9822a); }
+  .d-down { background: linear-gradient(160deg,#e05b5b,#a83636); }
+  .d-reset{ background: linear-gradient(160deg,#ffd166,#e0973f); box-shadow: 0 0 12px rgba(255,209,102,.65), inset 0 1px 0 rgba(255,255,255,.35); }
+
+  #keypad { display: none; margin-top: 14px; }
+  body.is-mobile #keypad { display: block; }
+  .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .keypad-grid .key {
+    padding: 16px 0; text-align: center; font-size: 20px; font-weight: 800; border-radius: 12px;
+    background: var(--pill-bg); border: 1px solid var(--pill-border); color: var(--text-main);
+    cursor: pointer; user-select: none; transition: .12s; font-family: 'JetBrains Mono', 'Consolas', monospace;
+  }
+  .keypad-grid .key:active { transform: scale(.94); background: rgba(124,90,224,.4); }
+  .keypad-grid .key.key-del { background: rgba(168,54,54,.22); border-color: rgba(224,91,91,.4); color: #ff9d9d; }
+  .keypad-grid .key.key-zero { grid-column: span 2; }
+
+  .gauge-card { text-align: center; position: relative; }
+  .gauge-card.glow-high { box-shadow: 0 0 0 1px rgba(47,143,90,.4), 0 0 44px rgba(47,143,90,.35), 0 8px 28px rgba(0,0,0,.4); }
+  .gauge-card.glow-mid  { box-shadow: 0 0 0 1px rgba(124,90,224,.4), 0 0 44px rgba(124,90,224,.3), 0 8px 28px rgba(0,0,0,.4); }
+  .gauge-card.glow-low  { box-shadow: 0 0 0 1px rgba(224,91,91,.4), 0 0 44px rgba(224,91,91,.3), 0 8px 28px rgba(0,0,0,.4); }
+
+  .gauge-wrap { position: relative; width: 230px; height: 170px; margin: 6px auto -8px; }
+  @media (min-width: 700px) { .gauge-wrap { width: 270px; height: 199px; } }
+  @media (min-width: 1024px) { .gauge-wrap { width: 310px; height: 229px; } }
+  .gauge-wrap svg { width: 100%; height: 100%; display: block; }
+  #gaugeArc { transition: stroke-dashoffset 0.7s cubic-bezier(.4,0,.2,1), stroke 0.5s ease; }
+
+  @keyframes shakeX {
+    0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); } 80% { transform: translateX(4px); }
+  }
+  .gauge-wrap.shake { animation: shakeX .45s ease; }
+
+  .gauge-center { position: absolute; left: 0; right: 0; top: 52%; transform: translateY(-38%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .gauge-pct { font-size: 42px; font-weight: 900; line-height: 1; transition: color .4s ease; }
+  @media (min-width: 1024px) { .gauge-pct { font-size: 54px; } }
+  @keyframes bumpUp { 0% { transform: scale(1); } 45% { transform: scale(1.18); } 100% { transform: scale(1); } }
+  .gauge-pct.bump { animation: bumpUp .5s ease; }
+  .gauge-tag { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .gauge-minmax { display: flex; justify-content: space-between; width: 200px; margin: 2px auto 0; font-size: 11px; color: var(--text-faint); }
+
+  @keyframes flamePulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: .7; } }
+  .fire-badge { position: absolute; top: 10px; right: 22px; font-size: 22px; display: none; animation: flamePulse 1s ease-in-out infinite; }
+
+  .badge-row { display: flex; justify-content: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .badge { font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; border: 1px solid; display: inline-flex; align-items: center; gap: 4px; }
+  .badge-green { color: #6be08a; border-color: #2f8f5a; background: rgba(47,143,90,.15); }
+  .badge-yellow { color: #ffd166; border-color: #b9822a; background: rgba(185,130,42,.15); }
+  .badge-red { color: #ff8a8a; border-color: #a83636; background: rgba(168,54,54,.15); }
+
+  .verdict {
+    margin-top: 14px; padding: 12px 14px; border-radius: 12px; font-size: 13px; font-weight: 600;
+    text-align: left; border: 1px solid; line-height: 1.5; transition: all .3s ease;
+  }
+  .verdict-high { background: rgba(47,143,90,.12); border-color: #2f8f5a; color: #8ef0b0; }
+  .verdict-mid  { background: rgba(124,90,224,.12); border-color: #6c4fd1; color: #cbb8ff; }
+  .verdict-low  { background: rgba(224,91,91,.12); border-color: #a83636; color: #ff9d9d; }
+
+  .breakdown { font-size: 12px; color: var(--text-muted); margin-top: 10px; text-align: center; }
+  .breakdown b { color: var(--text-main); }
+
+  .log-details { margin-top: 10px; text-align: left; background: rgba(255,255,255,0.03); border-radius: 10px; padding: 8px 12px; }
+  .log-details summary { cursor: pointer; font-size: 12px; font-weight: 700; color: #cbb8ff; }
+  .log-list { margin: 8px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-muted); }
+  .log-list li { margin-bottom: 3px; }
+
+  .note-input {
+    width: 100%; margin-top: 12px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--input-border);
+    background: var(--input-bg); color: var(--text-main); font-size: 12px;
+  }
+  .note-input:focus { outline: none; border-color: #7d5fe0; }
+
+  .action-row { display: flex; gap: 8px; margin-top: 10px; }
+  .save-btn {
+    flex: 1; padding: 11px; border-radius: 10px; border: none; color: #fff; font-weight: 700; font-size: 13px;
+    cursor: pointer; transition: filter .15s, transform .1s;
+  }
+  .save-btn:active { transform: scale(.97); }
+  .save-btn.btn-save { background: linear-gradient(135deg,#7d5fe0,#5a3fc0); }
+  .save-btn.btn-sim { background: linear-gradient(135deg,#2fbf83,#1f8f61); }
+  .save-btn:hover { filter: brightness(1.1); }
+  .save-btn:disabled { opacity: .4; cursor: not-allowed; filter: none; }
+  .sim-hint { font-size: 11px; color: var(--text-faint); margin-top: 8px; }
+
+  .sim-overlay {
+    position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 1500; opacity: 0; pointer-events: none; transition: opacity .25s ease; text-align: center;
+    background: rgba(5,4,10,.6); backdrop-filter: blur(4px);
+  }
+  .sim-overlay.show { opacity: 1; pointer-events: auto; }
+  .sim-emoji { font-size: 64px; animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both; }
+  .sim-text { font-size: 28px; font-weight: 900; margin-top: 8px; }
+  .sim-sub { font-size: 14px; color: #cbb8ff; margin-top: 4px; }
+  .sim-success .sim-text { color: #6be08a; }
+  .sim-fail .sim-text { color: #ff8a8a; animation: shakeX .4s ease; }
+  .sim-close-hint { font-size: 11px; color: #9d94b8; margin-top: 16px; }
+
+  .hist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .hist-header h2 { margin: 0; }
+  .hist-header-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .hist-filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .hist-filters select {
+    flex: 1; min-width: 120px; padding: 8px 10px; border-radius: 10px; font-size: 12px;
+    background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main);
+  }
+  .mini-btn {
+    font-size: 11px; padding: 6px 10px; border-radius: 8px;
+    background: rgba(168,54,54,.15); border: 1px solid rgba(224,91,91,.35); color: #ff9d9d;
+    cursor: pointer; font-weight: 700; transition: background .15s;
+  }
+  .mini-btn:hover { background: rgba(168,54,54,.28); }
+  .mini-btn.mb-neutral { background: var(--pill-bg); border-color: var(--pill-border); color: var(--text-main); }
+  .mini-btn.mb-neutral:hover { background: rgba(124,90,224,.25); }
+
+  .hist-row {
+    padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid; animation: fadeSlideUp .3s ease both;
+  }
+  .hist-top { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono','Consolas',monospace; font-weight: 700; font-size: 13px; }
+  .hist-level { min-width: 32px; }
+  .hist-rate { flex: 0 0 auto; }
+  .hist-verdict { white-space: nowrap; }
+  .hist-time { font-size: 10px; color: var(--text-faint); margin-left: auto; font-weight: 400; font-family: inherit; }
+  .hist-note { font-size: 11px; color: var(--text-muted); margin-top: 5px; font-style: italic; }
+  .hist-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+  .hist-del { margin-left: auto; }
+  .act-success { background: rgba(47,143,90,.18) !important; border-color: rgba(47,143,90,.4) !important; color: #8ef0b0 !important; }
+  .act-fail { background: rgba(168,54,54,.18) !important; border-color: rgba(224,91,91,.4) !important; color: #ff9d9d !important; }
+  .result-tag { font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 8px; }
+  .tag-success { background: rgba(47,143,90,.18); color: #8ef0b0; }
+  .tag-fail { background: rgba(168,54,54,.18); color: #ff9d9d; }
+
+  .hist-high { background: rgba(47,143,90,.12); border-color: rgba(47,143,90,.35); color: #8ef0b0; }
+  .hist-mid  { background: rgba(124,90,224,.12); border-color: rgba(124,90,224,.35); color: #cbb8ff; }
+  .hist-low  { background: rgba(224,91,91,.12); border-color: rgba(224,91,91,.35); color: #ff9d9d; }
+
+  .stat-row { display: flex; justify-content: space-between; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.03); margin-bottom: 6px; font-size: 12px; }
+  .stat-label { color: var(--text-muted); }
+  .stat-val { font-weight: 700; color: var(--text-main); }
+  .stat-summary { font-size: 12px; margin-top: 6px; color: var(--text-muted); }
+
+  .calib-box { border-radius: 12px; padding: 12px 14px; font-size: 12px; font-weight: 600; line-height: 1.5; margin-bottom: 12px; border: 1px solid; }
+  .calib-hot  { background: rgba(224,91,91,.12); border-color: #a83636; color: #ff9d9d; }
+  .calib-cold { background: rgba(90,140,240,.12); border-color: #5a8cf0; color: #a9c4ff; }
+  .calib-ok   { background: rgba(47,143,90,.12); border-color: #2f8f5a; color: #8ef0b0; }
+
+  .level-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .level-table th, .level-table td { padding: 6px 8px; border: 1px solid var(--table-border); text-align: center; }
+  .level-table th { background: var(--table-th-bg); color: #cbb8ff; font-size: 11px; }
+  .level-table tr:nth-child(even) { background: var(--table-even); }
+
+  .chart-wrap { width: 100%; }
+  .chart-wrap svg { width: 100%; height: auto; display: block; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .legend-line { width: 14px; height: 2px; display: inline-block; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; }
+  th, td { padding: 6px 8px; border: 1px solid var(--table-border); text-align: center; }
+  th { background: var(--table-th-bg); color: #cbb8ff; font-size: 11px; }
+  tr:nth-child(even) { background: var(--table-even); }
+  tr.current-row td { background: linear-gradient(90deg, rgba(124,90,224,.35), rgba(90,140,240,.12)); color: #fff; font-weight: 700; }
+  tr.current-row td:first-child { border-left: 3px solid #7d5fe0; }
+</style>
+</head>
+<body>
+
+<div id="deviceChooser">
+  <h1>🎲 Dây Mồi Calculator</h1>
+  <p>Bạn đang dùng thiết bị nào?</p>
+  <div class="device-btn" id="btnPC">💻 Máy tính (PC)<span class="sub">Gõ dây mồi bằng bàn phím thường</span></div>
+  <div class="device-btn" id="btnMobile">📱 Điện thoại (Mobile)<span class="sub">Dùng bàn phím số cảm ứng tiện hơn</span></div>
+</div>
+
+<div id="simOverlay" class="sim-overlay"></div>
+
+<div class="wrap" id="mainWrap">
+
+  <div class="topbar">
+    <div class="topbar-title">🎲 Dây Mồi Calculator</div>
+    <div class="topbar-controls">
+      <button id="soundToggle" class="icon-btn" title="Bật/tắt âm thanh">🔊</button>
+      <button id="themeToggle" class="icon-btn" title="Đổi giao diện sáng/tối">☀️</button>
+    </div>
+  </div>
+
+  <div class="card" style="animation-delay:.05s;">
+    <h2>🎯 Chọn cấp muốn lên</h2>
+    <div id="targetPills" class="pill-row"></div>
+  </div>
+
+  <div class="card" style="animation-delay:.12s;">
+    <h2>🎲 Nhập dây mồi</h2>
+    <input id="chainInput" type="text" placeholder="Ví dụ: 216524163267423" value="21232131" />
+    <div class="input-actions">
+      <button id="delOneBtn" class="mini-btn mb-neutral">⌫ Xóa 1 số</button>
+      <button id="clearAllBtn" class="mini-btn mb-neutral">🗑 Xóa tất cả</button>
+    </div>
+    <div id="chipRow" class="chip-row"></div>
+
+    <div id="keypad">
+      <div class="keypad-grid">
+        <div class="key" data-d="1">1</div><div class="key" data-d="2">2</div><div class="key" data-d="3">3</div>
+        <div class="key" data-d="4">4</div><div class="key" data-d="5">5</div><div class="key" data-d="6">6</div>
+        <div class="key" data-d="7">7</div><div class="key" data-d="8">8</div><div class="key" data-d="9">9</div>
+        <div class="key key-zero" data-d="0">0</div><div class="key key-del" id="keyDel">✕</div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:12px;">
+      Mỗi số = cấp mà thẻ mồi rớt về sau 1 lần đập xịt.
+      <span style="color:#6be08a;">■ 2,3 tăng tỷ lệ</span> ·
+      <span style="color:#e0a83f;">■ 4 giữ nguyên</span> ·
+      <span style="color:#e05b5b;">■ 5+ giảm tỷ lệ</span> ·
+      <span style="color:#ffd166;">■ 1 reset tích lũy</span>
+    </div>
+  </div>
+
+  <div class="card gauge-card" id="gaugeCard" style="animation-delay:.19s;">
+    <h2 style="justify-content:center;">📊 Tỉ lệ thành công</h2>
+    <div class="gauge-wrap">
+      <span id="fireBadge" class="fire-badge">🔥</span>
+      <svg viewBox="0 0 220 160">
+        <defs>
+          <linearGradient id="gradHigh" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#7d5fe0"/><stop offset="55%" stop-color="#5a8cf0"/><stop offset="100%" stop-color="#4fd1c5"/>
+          </linearGradient>
+          <linearGradient id="gradMid" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#8a6fe0"/><stop offset="100%" stop-color="#e0a83f"/>
+          </linearGradient>
+          <linearGradient id="gradLow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e0973f"/><stop offset="100%" stop-color="#e0524f"/>
+          </linearGradient>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <circle id="gaugeTrack" cx="110" cy="110" r="85" stroke="#241f3d" stroke-width="16" fill="none" stroke-linecap="round" transform="rotate(150 110 110)"/>
+        <circle id="gaugeArc" cx="110" cy="110" r="85" stroke="url(#gradHigh)" stroke-width="16" fill="none" stroke-linecap="round" filter="url(#glow)" transform="rotate(150 110 110)"/>
+      </svg>
+      <div class="gauge-center">
+        <div id="gaugePct" class="gauge-pct">--%</div>
+        <div id="gaugeTag" class="gauge-tag">nhập dây mồi để xem</div>
+      </div>
+    </div>
+    <div class="gauge-minmax"><span>0%</span><span>100%</span></div>
+
+    <div id="badgeRow" class="badge-row"></div>
+    <div id="verdictBox" class="verdict verdict-mid" style="display:none;"></div>
+    <div id="breakdown" class="breakdown"></div>
+    <details class="log-details">
+      <summary>🔍 Xem chi tiết từng con số</summary>
+      <ul id="detailLogs" class="log-list"></ul>
+    </details>
+
+    <input id="noteInput" type="text" class="note-input" placeholder="📝 Ghi chú (vd: tên cầu thủ)... — tuỳ chọn">
+    <div class="action-row">
+      <button id="saveResultBtn" class="save-btn btn-save" disabled>💾 Lưu kết quả</button>
+      <button id="simulateBtn" class="save-btn btn-sim" disabled>🎲 Thử nâng cấp</button>
+    </div>
+    <div class="sim-hint">* Nút "Thử nâng cấp" chỉ là mô phỏng xác suất cho vui theo % ước tính, không phải kết quả thật trong game.</div>
+  </div>
+
+  <div class="card" style="animation-delay:.26s;">
+    <div class="hist-header">
+      <h2>🕘 Lịch sử</h2>
+      <div class="hist-header-btns">
+        <button id="exportBtn" class="mini-btn mb-neutral">📤 Xuất JSON</button>
+        <button id="importBtn" class="mini-btn mb-neutral">📥 Nhập JSON</button>
+        <input type="file" id="importInput" accept="application/json" style="display:none">
+        <button id="clearHistoryBtn" class="mini-btn">🗑 Xóa lịch sử</button>
+      </div>
+    </div>
+    <div class="hist-filters">
+      <select id="filterLevel"><option value="all">Tất cả cấp</option></select>
+      <select id="filterResult">
+        <option value="all">Tất cả kết quả</option>
+        <option value="success">✅ Chỉ thành công</option>
+        <option value="fail">❌ Chỉ thất bại</option>
+        <option value="unrated">⏳ Chưa đánh dấu</option>
+      </select>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <div class="card" style="animation-delay:.33s;">
+    <h2>📈 Thống kê độ chính xác</h2>
+    <div id="calibBox"></div>
+    <div id="statsBox"></div>
+  </div>
+
+  <div class="card" style="animation-delay:.38s;">
+    <h2>🎯 Thống kê theo từng cấp</h2>
+    <div id="levelStatsBox"></div>
+  </div>
+
+  <div class="card" style="animation-delay:.43s;">
+    <h2>📉 Biểu đồ dự đoán vs thực tế</h2>
+    <div id="chartBox" class="chart-wrap"></div>
+  </div>
+
+  <div class="card" style="animation-delay:.48s;" id="baseTableCard">
+    <h2>📋 Bảng tỷ lệ gốc</h2>
+    <table>
+      <thead><tr><th>Cấp</th><th>OVR +</th><th>Tổng OVR</th><th>Tỷ lệ gốc</th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <p class="note" style="margin-top:10px;">
+      Đây là mô hình ước tính dựa trên kinh nghiệm cộng đồng ("dây mồi"), chưa được nhà phát hành xác nhận là cơ chế thật.
+      Số liệu chỉ mang tính tham khảo, không đảm bảo kết quả.
+    </p>
+  </div>
+
+</div>
+
+<script>
+const levels = [
+  { from: 1, to: 2, plus: 1, total: 1, rate: 100 },
+  { from: 2, to: 3, plus: 1, total: 2, rate: 81 },
+  { from: 3, to: 4, plus: 2, total: 4, rate: 64 },
+  { from: 4, to: 5, plus: 2, total: 6, rate: 50 },
+  { from: 5, to: 6, plus: 2, total: 8, rate: 26 },
+  { from: 6, to: 7, plus: 3, total: 11, rate: 15 },
+  { from: 7, to: 8, plus: 4, total: 15, rate: 7 },
+  { from: 8, to: 9, plus: 2, total: 17, rate: 5 },
+  { from: 9, to: 10, plus: 2, total: 19, rate: 4 },
+  { from: 10, to: 11, plus: 2, total: 21, rate: 3 },
+  { from: 11, to: 12, plus: 3, total: 24, rate: 2 },
+  { from: 12, to: 13, plus: 3, total: 27, rate: 1 }
+];
+
+const STEP_UP = 6, STREAK_STEP = 1, PENALTY_5 = 8, CAP_BONUS = 45;
+
+const rawGoodChains56 = ["3331","223","121","31","322","3233","44","2422","144","232","222","223","31","3332","234","122","244","422","1322","331","2424"];
+const rawGoodChains67 = ["2232","223344","422","33122","332","3232","232","23","141","21","2332","4134","33","313","2242","32242","333","34234","3138","2432"];
+function buildPatternSet(raw) { return [...new Set(raw)].map(text => ({ text, bonus: Math.min(6 + text.length * 3, 20) })); }
+const goodPatterns = { "5-6": buildPatternSet(rawGoodChains56), "6-7": buildPatternSet(rawGoodChains67) };
+
+const targetPillsEl = document.getElementById('targetPills');
+const tableBody = document.getElementById('tableBody');
+const chainInput = document.getElementById('chainInput');
+const chipRow = document.getElementById('chipRow');
+const gaugeCardEl = document.getElementById('gaugeCard');
+const gaugeWrapEl = document.querySelector('.gauge-wrap');
+const gaugePctEl = document.getElementById('gaugePct');
+const fireBadgeEl = document.getElementById('fireBadge');
+const saveBtn = document.getElementById('saveResultBtn');
+const simulateBtn = document.getElementById('simulateBtn');
+const noteInput = document.getElementById('noteInput');
+
+let targetLevel = 6;
+let lastRate = null;
+let wasHigh = false;
+let currentResult = null;
+let filterLevel = 'all';
+let filterResult = 'all';
+
+/* ===== Theme ===== */
+let theme = 'dark';
+try { theme = localStorage.getItem('dayMoiTheme') || 'dark'; } catch (e) {}
+function applyTheme(t) {
+  document.body.classList.toggle('theme-light', t === 'light');
+  document.getElementById('themeToggle').textContent = t === 'light' ? '🌙' : '☀️';
+}
+applyTheme(theme);
+document.getElementById('themeToggle').addEventListener('click', () => {
+  theme = theme === 'light' ? 'dark' : 'light';
+  try { localStorage.setItem('dayMoiTheme', theme); } catch (e) {}
+  applyTheme(theme);
+});
+
+/* ===== Âm thanh ===== */
+let soundOn = true;
+try { soundOn = (localStorage.getItem('dayMoiSound') ?? 'on') === 'on'; } catch (e) {}
+function updateSoundBtn() { document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇'; }
+updateSoundBtn();
+document.getElementById('soundToggle').addEventListener('click', () => {
+  soundOn = !soundOn;
+  try { localStorage.setItem('dayMoiSound', soundOn ? 'on' : 'off'); } catch (e) {}
+  updateSoundBtn();
+});
+let audioCtx = null;
+function playTone(freq, duration, type, vol) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = type || 'sine'; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol || 0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+  } catch (e) {}
+}
+function playBumpSound() { playTone(880, 0.18, 'sine', 0.12); setTimeout(() => playTone(1175, 0.15, 'sine', 0.1), 90); }
+function playShakeSound() { playTone(220, 0.25, 'sawtooth', 0.1); }
+
+/* ===== Rung ===== */
+function vibrate(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} } }
+
+/* ===== Gauge half-donut 240° ===== */
+const GAUGE_R = 85;
+const GAUGE_C = 2 * Math.PI * GAUGE_R;
+const GAUGE_ARC_LEN = GAUGE_C * (240 / 360);
+const GAUGE_GAP_LEN = GAUGE_C - GAUGE_ARC_LEN;
+
+function initGaugeTrack() {
+  const track = document.getElementById('gaugeTrack');
+  track.setAttribute('stroke-dasharray', `${GAUGE_ARC_LEN} ${GAUGE_GAP_LEN}`);
+  track.setAttribute('stroke-dashoffset', 0);
+  const arc = document.getElementById('gaugeArc');
+  arc.setAttribute('stroke-dasharray', `${GAUGE_ARC_LEN} ${GAUGE_GAP_LEN}`);
+  arc.setAttribute('stroke-dashoffset', GAUGE_ARC_LEN);
+}
+
+function setGauge(pct) {
+  const clamped = Math.max(0, Math.min(100, pct));
+  const progressLen = GAUGE_ARC_LEN * (clamped / 100);
+  const arc = document.getElementById('gaugeArc');
+  arc.setAttribute('stroke-dashoffset', GAUGE_ARC_LEN - progressLen);
+
+  let gradId, numColor, glowCls;
+  if (clamped >= 60) { gradId = 'gradHigh'; numColor = '#8ef0b0'; glowCls = 'glow-high'; }
+  else if (clamped >= 30) { gradId = 'gradMid'; numColor = '#cbb8ff'; glowCls = 'glow-mid'; }
+  else { gradId = 'gradLow'; numColor = '#ff9d9d'; glowCls = 'glow-low'; }
+  arc.setAttribute('stroke', `url(#${gradId})`);
+  gaugePctEl.textContent = clamped.toFixed(1) + '%';
+  gaugePctEl.style.color = numColor;
+
+  gaugeCardEl.classList.remove('glow-high','glow-mid','glow-low');
+  gaugeCardEl.classList.add(glowCls);
+  fireBadgeEl.style.display = clamped >= 60 ? 'inline-block' : 'none';
+}
+
+/* ===== Lịch sử ===== */
+let history = [];
+try { history = JSON.parse(localStorage.getItem('dayMoiHistory') || '[]'); } catch (e) { history = []; }
+function persistHistory() { try { localStorage.setItem('dayMoiHistory', JSON.stringify(history)); } catch (e) {} }
+
+function verdictLabel(rate) {
+  if (rate >= 60) return { emoji: '🔥', text: 'NÊN ĐẬP', cls: 'hist-high' };
+  if (rate >= 30) return { emoji: '⚡', text: 'CÂN NHẮC', cls: 'hist-mid' };
+  return { emoji: '⚠️', text: 'RỦI RO CAO', cls: 'hist-low' };
+}
+function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+function resultText(h) {
+  const v = verdictLabel(h.rate);
+  return `Dây mồi: ${h.chain} | +${h.target} | Tỷ lệ ước tính: ${h.rate.toFixed(1)}% | ${v.emoji} ${v.text}` + (h.note ? ` | Ghi chú: ${h.note}` : '');
+}
+function resultActionsHtml(h) {
+  if (!h.result) {
+    return `<button class="mini-btn mb-neutral act-success" data-action="success">✅ Thành công</button>
+            <button class="mini-btn mb-neutral act-fail" data-action="fail">❌ Thất bại</button>`;
+  }
+  return `<span class="result-tag ${h.result === 'success' ? 'tag-success' : 'tag-fail'}">${h.result === 'success' ? '✅ Đã đập thành công' : '❌ Đã đập thất bại'}</span>
+          <button class="mini-btn mb-neutral" data-action="undo">↺ Sửa</button>`;
+}
+
+function populateLevelFilterOptions() {
+  const sel = document.getElementById('filterLevel');
+  const levelsPresent = [...new Set(history.map(h => h.target))].sort((a, b) => a - b);
+  const current = sel.value || 'all';
+  sel.innerHTML = '<option value="all">Tất cả cấp</option>' + levelsPresent.map(l => `<option value="${l}">+${l}</option>`).join('');
+  sel.value = levelsPresent.map(String).includes(current) ? current : 'all';
+  filterLevel = sel.value;
+}
+
+function getFilteredHistory() {
+  return history.filter(h => {
+    if (filterLevel !== 'all' && String(h.target) !== String(filterLevel)) return false;
+    if (filterResult === 'success' && h.result !== 'success') return false;
+    if (filterResult === 'fail' && h.result !== 'fail') return false;
+    if (filterResult === 'unrated' && h.result) return false;
+    return true;
+  });
+}
+
+function renderHistory() {
+  populateLevelFilterOptions();
+  const list = document.getElementById('historyList');
+  if (!history.length) { list.innerHTML = '<div class="note">Chưa có lịch sử nào — bấm "💾 Lưu kết quả" để lưu lại.</div>'; return; }
+  const filtered = getFilteredHistory();
+  if (!filtered.length) { list.innerHTML = '<div class="note">Không có mục nào khớp bộ lọc hiện tại.</div>'; return; }
+  list.innerHTML = filtered.slice().reverse().map(h => {
+    const v = verdictLabel(h.rate);
+    return `<div class="hist-row ${v.cls}" data-id="${h.id}">
+      <div class="hist-top">
+        <span class="hist-level">+${h.target}</span>
+        <span class="hist-rate">${h.rate.toFixed(1)}%</span>
+        <span class="hist-verdict">${v.emoji} ${v.text}</span>
+        <span class="hist-time">${formatTime(h.ts)}</span>
+      </div>
+      ${h.note ? `<div class="hist-note">📝 ${escapeHtml(h.note)}</div>` : ''}
+      <div class="hist-actions">
+        ${resultActionsHtml(h)}
+        <button class="mini-btn mb-neutral" data-action="copy">📋 Copy</button>
+        <button class="mini-btn hist-del" data-action="delete">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function refreshAnalytics() { renderStats(); renderStatsByLevel(); renderCalibration(); renderChart(); }
+
+function setResult(id, result) {
+  const item = history.find(h => h.id === id);
+  if (!item) return;
+  item.result = result;
+  persistHistory(); renderHistory(); refreshAnalytics();
+}
+function deleteEntry(id) {
+  history = history.filter(h => h.id !== id);
+  persistHistory(); renderHistory(); refreshAnalytics();
+}
+async function copyText(text, btnEl) {
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e2) {}
+    document.body.removeChild(ta);
+  }
+  if (btnEl) { const orig = btnEl.textContent; btnEl.textContent = '✅ Đã copy'; setTimeout(() => { btnEl.textContent = orig; }, 1200); }
+}
+
+document.getElementById('historyList').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  const row = e.target.closest('.hist-row');
+  const id = row ? row.dataset.id : null;
+  const action = btn.dataset.action;
+  if (!id) return;
+  if (action === 'success') setResult(id, 'success');
+  else if (action === 'fail') setResult(id, 'fail');
+  else if (action === 'undo') setResult(id, null);
+  else if (action === 'copy') { const h = history.find(x => x.id === id); if (h) copyText(resultText(h), btn); }
+  else if (action === 'delete') deleteEntry(id);
+});
+
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+  history = []; persistHistory(); renderHistory(); refreshAnalytics();
+});
+
+saveBtn.addEventListener('click', () => {
+  if (!currentResult) return;
+  const id = Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  history.push({ id, target: currentResult.target, rate: currentResult.rate, chain: currentResult.chain, note: noteInput.value.trim(), ts: Date.now(), result: null });
+  if (history.length > 80) history = history.slice(-80);
+  noteInput.value = '';
+  persistHistory(); renderHistory(); refreshAnalytics();
+  vibrate(30);
+});
+
+document.getElementById('filterLevel').addEventListener('change', (e) => { filterLevel = e.target.value; renderHistory(); });
+document.getElementById('filterResult').addEventListener('change', (e) => { filterResult = e.target.value; renderHistory(); });
+
+/* ===== Xuất / Nhập JSON ===== */
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'day-moi-history.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importInput').click());
+document.getElementById('importInput').addEventListener('change', (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) {
+        const existingIds = new Set(history.map(h => h.id));
+        data.forEach(item => { if (item && item.id && !existingIds.has(item.id)) { history.push(item); existingIds.add(item.id); } });
+        persistHistory(); renderHistory(); refreshAnalytics();
+      } else { alert('File JSON không đúng định dạng (cần là một mảng).'); }
+    } catch (err) { alert('Không đọc được file JSON này.'); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+/* ===== Thống kê độ chính xác ===== */
+function computeStats() {
+  const rated = history.filter(h => h.result);
+  if (!rated.length) return null;
+  const buckets = {
+    high: { count: 0, success: 0, label: 'Dự đoán CAO (≥60%)' },
+    mid:  { count: 0, success: 0, label: 'Dự đoán VỪA (30-59%)' },
+    low:  { count: 0, success: 0, label: 'Dự đoán THẤP (<30%)' }
+  };
+  let sumPredicted = 0, sumActual = 0;
+  rated.forEach(h => {
+    const key = h.rate >= 60 ? 'high' : h.rate >= 30 ? 'mid' : 'low';
+    buckets[key].count++;
+    if (h.result === 'success') buckets[key].success++;
+    sumPredicted += h.rate;
+    sumActual += h.result === 'success' ? 100 : 0;
+  });
+  return { buckets, total: rated.length, avgPredicted: sumPredicted / rated.length, avgActual: sumActual / rated.length };
+}
+function renderStats() {
+  const box = document.getElementById('statsBox');
+  const stats = computeStats();
+  if (!stats) { box.innerHTML = '<div class="note">Chưa có dữ liệu — hãy đánh dấu ✅/❌ cho các lần đã lưu ở lịch sử.</div>'; return; }
+  const rows = Object.values(stats.buckets).filter(b => b.count > 0).map(b => {
+    const actualPct = (b.success / b.count * 100).toFixed(1);
+    return `<div class="stat-row"><span class="stat-label">${b.label}</span><span class="stat-val">${b.success}/${b.count} đúng (${actualPct}%)</span></div>`;
+  }).join('');
+  const diff = (stats.avgActual - stats.avgPredicted).toFixed(1);
+  box.innerHTML = `${rows}
+    <div class="stat-summary">
+      Trung bình dự đoán: <b>${stats.avgPredicted.toFixed(1)}%</b> · Trung bình thực tế: <b>${stats.avgActual.toFixed(1)}%</b>
+      <span style="color:${diff >= 0 ? '#6be08a' : '#ff8a8a'}">(${diff >= 0 ? '+' : ''}${diff}%)</span>
+    </div>
+    <div class="note" style="margin-top:8px;">Dựa trên ${stats.total} lần đã đánh dấu kết quả — càng nhiều dữ liệu, con số này càng đáng tin.</div>`;
+}
+
+/* ===== Cảnh báo hiệu chỉnh tổng thể ===== */
+function renderCalibration() {
+  const box = document.getElementById('calibBox');
+  const stats = computeStats();
+  if (!stats || stats.total < 10) {
+    box.innerHTML = `<div class="note">Cần thêm dữ liệu (hiện có ${stats ? stats.total : 0}/10) để đánh giá độ chính xác tổng thể của công thức.</div>`;
+    return;
+  }
+  const diff = stats.avgActual - stats.avgPredicted;
+  if (diff <= -8) {
+    box.innerHTML = `<div class="calib-box calib-hot">⚠️ Công thức đang dự đoán <b>LẠC QUAN</b> hơn thực tế khoảng <b>${Math.abs(diff).toFixed(1)}%</b>. Có thể cân nhắc giảm <b>STEP_UP</b> / <b>PENALTY_5</b> trong code để sát thực tế hơn.</div>`;
+  } else if (diff >= 8) {
+    box.innerHTML = `<div class="calib-box calib-cold">💡 Công thức đang dự đoán <b>THẤP</b> hơn thực tế khoảng <b>${diff.toFixed(1)}%</b>. Có thể tăng nhẹ <b>STEP_UP</b> nếu muốn công thức phản ánh đúng hơn.</div>`;
+  } else {
+    box.innerHTML = `<div class="calib-box calib-ok">✅ Công thức đang khá sát với thực tế (chênh ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%).</div>`;
+  }
+}
+
+/* ===== Thống kê theo từng cấp cụ thể ===== */
+function computeStatsByLevel() {
+  const rated = history.filter(h => h.result);
+  const map = {};
+  rated.forEach(h => {
+    if (!map[h.target]) map[h.target] = { count: 0, success: 0, sumPredicted: 0 };
+    map[h.target].count++;
+    if (h.result === 'success') map[h.target].success++;
+    map[h.target].sumPredicted += h.rate;
+  });
+  return map;
+}
+function renderStatsByLevel() {
+  const box = document.getElementById('levelStatsBox');
+  const map = computeStatsByLevel();
+  const levelsPresent = Object.keys(map).map(Number).sort((a, b) => a - b);
+  if (!levelsPresent.length) { box.innerHTML = '<div class="note">Chưa có dữ liệu — cần đánh dấu kết quả thực tế theo từng cấp trước.</div>'; return; }
+  const rows = levelsPresent.map(lv => {
+    const d = map[lv];
+    const actualPct = (d.success / d.count * 100);
+    const predictedAvg = d.sumPredicted / d.count;
+    const diff = actualPct - predictedAvg;
+    const diffColor = diff >= 0 ? '#6be08a' : '#ff8a8a';
+    return `<tr>
+      <td>+${lv}</td><td>${d.count}</td><td>${d.success}</td>
+      <td>${actualPct.toFixed(1)}%</td><td>${predictedAvg.toFixed(1)}%</td>
+      <td style="color:${diffColor};font-weight:700;">${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table class="level-table">
+    <thead><tr><th>Cấp</th><th>Số lần</th><th>Thành công</th><th>Tỷ lệ thực tế</th><th>Dự đoán TB</th><th>Chênh lệch</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <p class="note" style="margin-top:10px;">Mỗi cấp có tỷ lệ gốc khác nhau nên xem riêng từng dòng sẽ chính xác hơn gộp chung theo mức cao/vừa/thấp.</p>`;
+}
+
+/* ===== Biểu đồ dự đoán vs thực tế theo thời gian ===== */
+function renderChart() {
+  const box = document.getElementById('chartBox');
+  const data = history.filter(h => h.result);
+  if (data.length < 2) {
+    box.innerHTML = '<div class="note">Cần ít nhất 2 kết quả đã đánh dấu để vẽ biểu đồ.</div>';
+    return;
+  }
+  const W = 600, H = 220;
+  const pad = { left: 32, right: 14, top: 14, bottom: 24 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+  const n = data.length;
+  const xAt = i => pad.left + (n === 1 ? 0 : chartW * i / (n - 1));
+  const yAt = v => pad.top + chartH * (1 - v / 100);
+
+  const window = Math.min(5, n);
+  const rollingActual = data.map((h, i) => {
+    const start = Math.max(0, i - window + 1);
+    const slice = data.slice(start, i + 1);
+    const succ = slice.filter(x => x.result === 'success').length;
+    return succ / slice.length * 100;
+  });
+
+  const predictedPts = data.map((h, i) => `${xAt(i)},${yAt(h.rate)}`).join(' ');
+  const rollingPts = rollingActual.map((v, i) => `${xAt(i)},${yAt(v)}`).join(' ');
+  const dots = data.map((h, i) =>
+    `<circle cx="${xAt(i)}" cy="${yAt(h.result === 'success' ? 100 : 0)}" r="4" fill="${h.result === 'success' ? '#2fbf83' : '#e05b5b'}" stroke="#0d0b17" stroke-width="1"/>`
+  ).join('');
+
+  const gridLines = [0, 25, 50, 75, 100].map(v =>
+    `<line x1="${pad.left}" y1="${yAt(v)}" x2="${W - pad.right}" y2="${yAt(v)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+     <text x="4" y="${yAt(v) + 3}" font-size="9" fill="#6a628a">${v}</text>`
+  ).join('');
+
+  box.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}">
+      ${gridLines}
+      <polyline points="${predictedPts}" fill="none" stroke="#7d5fe0" stroke-width="2.5"/>
+      <polyline points="${rollingPts}" fill="none" stroke="#e0a83f" stroke-width="2" stroke-dasharray="5 4"/>
+      ${dots}
+    </svg>
+    <div class="chart-legend">
+      <span><span class="legend-line" style="background:#7d5fe0;"></span> Tỷ lệ dự đoán</span>
+      <span><span class="legend-line" style="background:#e0a83f;"></span> Tỷ lệ thực tế trượt (${window} lần gần nhất)</span>
+      <span><span class="legend-dot" style="background:#2fbf83;"></span> Thành công</span>
+      <span><span class="legend-dot" style="background:#e05b5b;"></span> Thất bại</span>
+    </div>`;
+}
+
+/* ===== Mô phỏng nâng cấp ===== */
+function showSimResult(success, rate) {
+  const overlay = document.getElementById('simOverlay');
+  overlay.className = 'sim-overlay ' + (success ? 'sim-success' : 'sim-fail') + ' show';
+  overlay.innerHTML = success
+    ? `<div class="sim-emoji">🎉</div><div class="sim-text">THÀNH CÔNG!</div><div class="sim-sub">Trúng tỷ lệ ${rate.toFixed(1)}%</div><div class="sim-close-hint">Chạm để đóng</div>`
+    : `<div class="sim-emoji">💥</div><div class="sim-text">THẤT BẠI</div><div class="sim-sub">Không trúng tỷ lệ ${rate.toFixed(1)}%</div><div class="sim-close-hint">Chạm để đóng</div>`;
+  clearTimeout(overlay._timer);
+  overlay._timer = setTimeout(() => overlay.classList.remove('show'), 2400);
+}
+document.getElementById('simOverlay').addEventListener('click', function () { this.classList.remove('show'); });
+simulateBtn.addEventListener('click', () => {
+  if (!currentResult) return;
+  const roll = Math.random() * 100;
+  const success = roll < currentResult.rate;
+  showSimResult(success, currentResult.rate);
+  vibrate(success ? [50] : [80, 40, 80]);
+  if (success) { playTone(1046, 0.22, 'sine', 0.15); setTimeout(() => playTone(1568, 0.2, 'sine', 0.12), 100); }
+  else { playTone(180, 0.35, 'sawtooth', 0.15); }
+});
+
+/* ===== Khởi tạo chung ===== */
+function init() {
+  levels.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.id = 'row-to-' + row.to;
+    tr.innerHTML = `<td>${row.from}→${row.to}</td><td>+${row.plus}</td><td>+${row.total}</td><td>${row.rate}%</td>`;
+    tableBody.appendChild(tr);
+  });
+
+  chainInput.addEventListener('input', () => { renderChips(); calculate(); });
+  document.getElementById('delOneBtn').addEventListener('click', () => { chainInput.value = chainInput.value.slice(0, -1); renderChips(); calculate(); });
+  document.getElementById('clearAllBtn').addEventListener('click', () => { chainInput.value = ''; renderChips(); calculate(); });
+
+  document.querySelectorAll('.keypad-grid .key[data-d]').forEach(btn => {
+    btn.addEventListener('click', () => { chainInput.value += btn.dataset.d; renderChips(); calculate(); });
+  });
+  document.getElementById('keyDel').addEventListener('click', () => { chainInput.value = chainInput.value.slice(0, -1); renderChips(); calculate(); });
+
+  document.getElementById('btnPC').addEventListener('click', () => chooseDevice('pc'));
+  document.getElementById('btnMobile').addEventListener('click', () => chooseDevice('mobile'));
+
+  initGaugeTrack();
+  renderTargetPills();
+  renderChips();
+  renderHistory();
+  refreshAnalytics();
+  calculate();
+}
+
+function chooseDevice(mode) {
+  document.getElementById('deviceChooser').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'flex';
+  if (mode === 'mobile') {
+    document.body.classList.add('is-mobile');
+    chainInput.setAttribute('readonly', 'readonly');
+    chainInput.setAttribute('inputmode', 'none');
+  } else {
+    document.body.classList.remove('is-mobile');
+    chainInput.removeAttribute('readonly');
+    chainInput.removeAttribute('inputmode');
+  }
+}
+
+function renderTargetPills() {
+  targetPillsEl.innerHTML = '';
+  for (let i = 2; i <= 13; i++) {
+    const pill = document.createElement('div');
+    pill.className = 'pill' + (i === targetLevel ? ' active' : '');
+    pill.textContent = '+' + i;
+    pill.addEventListener('click', () => { targetLevel = i; renderTargetPills(); calculate(); });
+    targetPillsEl.appendChild(pill);
+  }
+}
+
+function digitClass(digit, neutral) {
+  if (digit === 1) return 'd-reset';
+  if (digit === neutral) return 'd-neu';
+  if (digit < neutral) return 'd-up';
+  return 'd-down';
+}
+
+function renderChips() {
+  const chain = chainInput.value.replace(/[^0-9]/g, '');
+  chipRow.innerHTML = '';
+  chain.split('').forEach((ch, i) => {
+    const d = Number(ch);
+    const div = document.createElement('div');
+    div.className = 'digit-chip ' + digitClass(d, 4);
+    if (i === chain.length - 1) div.classList.add('chip-new');
+    div.textContent = ch;
+    chipRow.appendChild(div);
+  });
+}
+
+function evaluateDynamicChain(fullChain) {
+  const lastReset = fullChain.lastIndexOf('1');
+  const resetOccurred = lastReset !== -1;
+  const activeChain = resetOccurred ? fullChain.slice(lastReset + 1) : fullChain;
+  const logs = [];
+  if (resetOccurred) logs.push(`🔁 Mồi "1" ở vị trí ${lastReset + 1} → reset tích lũy, chỉ tính từ sau đó.`);
+  let delta = 0, streak = 0;
+  for (const ch of activeChain) {
+    const v = Number(ch);
+    if (v === 2 || v === 3) {
+      streak++;
+      const gain = STEP_UP * (v === 3 ? 1.5 : 1) + (streak - 1) * STREAK_STEP;
+      delta += gain;
+      logs.push(`Mồi ${v}: +${gain.toFixed(1)}% (combo x${streak})`);
+    } else if (v === 4) {
+      logs.push(`Mồi 4: +0% (giữ nguyên)`);
+    } else if (v >= 5) {
+      const loss = v === 5 ? PENALTY_5 : PENALTY_5 * 1.5;
+      delta -= loss; streak = 0;
+      logs.push(`Mồi ${v}: -${loss.toFixed(1)}% (gãy combo)`);
+    }
+  }
+  delta = Math.max(-CAP_BONUS, Math.min(CAP_BONUS, delta));
+  return { activeChain, delta, resetOccurred, logs };
+}
+
+function matchTailPattern(fullChain, current, target) {
+  const patterns = goodPatterns[`${current}-${target}`];
+  if (!patterns) return { bonus: 0, match: null };
+  let best = null;
+  patterns.forEach(p => { if (fullChain.endsWith(p.text) && (!best || p.text.length > best.text.length)) best = p; });
+  return best ? { bonus: best.bonus, match: best } : { bonus: 0, match: null };
+}
+
+function calculate() {
+  const target = targetLevel;
+  const current = target - 1;
+  const fullChain = chainInput.value.replace(/[^0-9]/g, '');
+
+  document.querySelectorAll('#tableBody tr').forEach(tr => tr.classList.remove('current-row'));
+  const row = document.getElementById('row-to-' + target);
+  if (row) row.classList.add('current-row');
+
+  const stepRow = levels.find(r => r.to === target);
+  const baseRate = stepRow ? stepRow.rate : 0;
+
+  const gaugeTag = document.getElementById('gaugeTag');
+  const badgeRow = document.getElementById('badgeRow');
+  const verdictBox = document.getElementById('verdictBox');
+  const breakdown = document.getElementById('breakdown');
+
+  if (!fullChain.length) {
+    setGauge(baseRate);
+    gaugeTag.textContent = `${current} → ${target} · gốc ${baseRate}%`;
+    badgeRow.innerHTML = '';
+    verdictBox.style.display = 'none';
+    breakdown.textContent = '';
+    document.getElementById('detailLogs').innerHTML = '';
+    lastRate = null; wasHigh = false;
+    currentResult = null;
+    saveBtn.disabled = true; simulateBtn.disabled = true;
+    return;
+  }
+
+  const dyn = evaluateDynamicChain(fullChain);
+  const tail = matchTailPattern(fullChain, current, target);
+  const totalAdjust = dyn.delta + tail.bonus;
+  const finalRate = Math.max(0.5, Math.min(100, baseRate + totalAdjust));
+
+  setGauge(finalRate);
+  gaugeTag.textContent = `${current} → ${target} · gốc ${baseRate}%`;
+
+  if (lastRate !== null) {
+    if (finalRate > lastRate + 0.05) {
+      gaugePctEl.classList.remove('bump'); void gaugePctEl.offsetWidth; gaugePctEl.classList.add('bump');
+      playBumpSound();
+    } else if (finalRate < lastRate - 0.05) {
+      gaugeWrapEl.classList.remove('shake'); void gaugeWrapEl.offsetWidth; gaugeWrapEl.classList.add('shake');
+      playShakeSound();
+    }
+  }
+  lastRate = finalRate;
+  if (finalRate >= 60 && !wasHigh) vibrate([40, 30, 40]);
+  wasHigh = finalRate >= 60;
+
+  currentResult = { target, rate: finalRate, chain: fullChain };
+  saveBtn.disabled = false; simulateBtn.disabled = false;
+
+  let confBadge;
+  if (dyn.activeChain.length >= 6 || tail.match) confBadge = ['badge-green','✅ Tin cậy'];
+  else if (dyn.activeChain.length >= 3) confBadge = ['badge-yellow','🟡 Tạm ổn'];
+  else confBadge = ['badge-red','🔴 Dữ liệu ít'];
+
+  let rateBadge;
+  if (finalRate >= 60) rateBadge = ['badge-green','🔥 Tỉ lệ cao'];
+  else if (finalRate >= 30) rateBadge = ['badge-yellow','⚡ Tỉ lệ vừa'];
+  else rateBadge = ['badge-red','⚠️ Tỉ lệ thấp'];
+
+  badgeRow.innerHTML = [confBadge, rateBadge].map(([cls,label]) => `<span class="badge ${cls}">${label}</span>`).join('');
+
+  let vClass, vText;
+  if (finalRate >= 60) {
+    vClass = 'verdict-high';
+    vText = `🔥 <b>Tỉ lệ CAO!</b> Dây mồi đang rất đẹp — có thể cân nhắc vào kèo. (${totalAdjust >= 0 ? '+' : ''}${totalAdjust.toFixed(1)}% so với tỷ lệ gốc)`;
+  } else if (finalRate >= 30) {
+    vClass = 'verdict-mid';
+    vText = `✨ Tỉ lệ khá ổn, dây mồi đang có tác động ${totalAdjust >= 0 ? 'tích cực' : 'tiêu cực'}. Cân nhắc thêm trước khi đập.`;
+  } else {
+    vClass = 'verdict-low';
+    vText = `⚠️ Tỉ lệ đang thấp — dây mồi chưa "chín", rủi ro cao nếu đập lúc này.`;
+  }
+  verdictBox.className = 'verdict ' + vClass;
+  verdictBox.style.display = 'block';
+  verdictBox.innerHTML = vText;
+
+  breakdown.innerHTML = `Điều chỉnh: <b>${totalAdjust >= 0 ? '+' : ''}${totalAdjust.toFixed(1)}%</b>
+    (động ${dyn.delta >= 0 ? '+' : ''}${dyn.delta.toFixed(1)}%, đuôi mẫu +${tail.bonus.toFixed(1)}%)
+    · Chuỗi hiệu lực: <b>${dyn.activeChain || '(rỗng)'}</b>`;
+
+  const detailLogs = dyn.logs.slice();
+  if (tail.match) detailLogs.push(`Khớp đuôi mẫu "${tail.match.text}" (+${tail.match.bonus.toFixed(1)}%)`);
+  document.getElementById('detailLogs').innerHTML = detailLogs.length
+    ? detailLogs.map(l => `<li>${l}</li>`).join('')
+    : '<li>Không có mồi 2/3/5+ nào tác động.</li>';
+}
+
+init();
+</script>
+</body>
+</html>
