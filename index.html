@@ -33,7 +33,7 @@
   body {
     font-family: -apple-system, "Segoe UI", Arial, sans-serif;
     background: radial-gradient(circle at 20% 0%, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 100%);
-    color: var(--text-main); margin: 0; padding: 24px; min-height: 100vh;
+    color: var(--text-main); margin: 0; padding: 0; min-height: 100vh;
     transition: background .3s ease, color .3s ease;
   }
 
@@ -80,6 +80,95 @@
   .cb-title { font-weight: 800; font-size: 14px; }
   .cb-sub { font-size: 11px; color: rgba(255,255,255,.8); }
   .cb-arrow { font-size: 18px; font-weight: 800; flex-shrink: 0; }
+
+  /* ===== App shell: sidebar (desktop) + bottom nav (mobile) ===== */
+  .app-shell { display: flex; align-items: flex-start; min-height: 100vh; }
+  .sidebar-nav {
+    width: 208px; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+    background: var(--card-bg); backdrop-filter: blur(16px); border-right: 1px solid var(--card-border);
+    padding: 20px 12px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .sidebar-logo { font-weight: 800; font-size: 15px; color: var(--text-main); padding: 0 8px 16px; }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--text-faint); font-weight: 500; margin-top: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 10px;
+    color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; background: none; border: none;
+    text-align: left; width: 100%; transition: background .15s, color .15s;
+  }
+  .nav-item .ni-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item:hover { background: rgba(124,90,224,.12); color: var(--text-main); }
+  .nav-item.active { background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; }
+  .sidebar-footer { margin-top: auto; padding-top: 12px; }
+  .sidebar-community {
+    display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 10px;
+    background: rgba(88,101,242,.15); border: 1px solid rgba(88,101,242,.35); color: #a9b3ff;
+    font-size: 11px; font-weight: 700; text-decoration: none;
+  }
+
+  .main-area { flex: 1; min-width: 0; padding: 20px 20px 24px; }
+  @media (max-width: 899px) { .main-area { padding-bottom: 88px; } .sidebar-nav { display: none; } }
+
+  .bottom-nav {
+    display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+    background: var(--card-bg); backdrop-filter: blur(16px); border-top: 1px solid var(--card-border);
+    padding: 6px 4px; justify-content: space-around;
+  }
+  @media (max-width: 899px) { .bottom-nav { display: flex; } }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: none;
+    color: var(--text-faint); font-size: 9px; font-weight: 700; padding: 6px 4px; border-radius: 10px; flex: 1;
+  }
+  .bn-item .bn-icon { font-size: 18px; }
+  .bn-item.active { color: #cbb8ff; }
+  .bn-item.active .bn-icon { transform: scale(1.1); }
+
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ===== Hero card ===== */
+  .hero-card {
+    background: linear-gradient(150deg, rgba(124,90,224,.25), rgba(79,209,197,.12)), var(--card-bg);
+    border: 1px solid rgba(124,90,224,.3); border-radius: 20px; padding: 22px;
+    text-align: center; box-shadow: 0 10px 32px rgba(124,90,224,.2);
+    animation: fadeSlideUp .5s ease both;
+  }
+  .hero-label { font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: .5px; }
+  .hero-pct { font-size: 52px; font-weight: 900; margin: 4px 0; background: linear-gradient(135deg,#cbb8ff,#8ef0b0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-diff { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .hero-bar-track { width: 100%; height: 10px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 14px; }
+  .hero-bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg,#7d5fe0,#4fd1c5); transition: width .6s ease; }
+  .hero-conf-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+  .hero-conf-track { flex: 1; height: 6px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .hero-conf-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#5a8cf0,#8ef0b0); transition: width .6s ease; }
+  .hero-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .hero-cta {
+    width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 700; font-size: 13px;
+    background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; cursor: pointer;
+  }
+
+  /* ===== Stat cards ===== */
+  .stat-cards-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 480px) { .stat-cards-row { grid-template-columns: repeat(4, 1fr); } }
+  .stat-card {
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 10px;
+    text-align: center; animation: fadeSlideUp .5s ease both;
+  }
+  .stat-card .sc-icon { font-size: 18px; }
+  .stat-card .sc-num { font-size: 22px; font-weight: 800; color: var(--text-main); font-family: 'JetBrains Mono','Consolas',monospace; margin: 2px 0; }
+  .stat-card .sc-label { font-size: 10px; color: var(--text-muted); }
+
+  .community-mini {
+    display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 12px 14px; border-radius: 14px;
+    background: rgba(88,101,242,.15); border: 1px solid rgba(88,101,242,.35); color: #a9b3ff; font-size: 12px; font-weight: 700;
+  }
+  .community-mini .cm-arrow { margin-left: auto; }
+
+  .quick-add-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .qa-pill {
+    width: 34px; height: 34px; border-radius: 9px; border: none; color: #fff; font-weight: 800; font-size: 14px;
+    cursor: pointer; font-family: 'JetBrains Mono','Consolas',monospace; transition: transform .1s;
+  }
+  .qa-pill:active { transform: scale(.9); }
 
   @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   .card {
@@ -392,175 +481,239 @@
 
 <div id="toast" class="toast"></div>
 
-<div class="wrap" id="mainWrap">
+<div class="app-shell" id="appShell" style="display:none;">
 
-  <div class="topbar">
-    <div class="topbar-title" id="topbarTitle" data-i18n="deviceTitle">🎲 Dây Mồi Calculator</div>
-    <div class="topbar-controls">
-      <button id="langToggle" class="icon-btn" title="Switch language / Đổi ngôn ngữ" style="font-size:11px;font-weight:800;">VI</button>
-      <button id="deviceToggle" class="icon-btn" title="Đổi PC / Mobile">📱</button>
-      <button id="soundToggle" class="icon-btn" title="Bật/tắt âm thanh">🔊</button>
-      <button id="themeToggle" class="icon-btn" title="Đổi giao diện sáng/tối">☀️</button>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="sidebar-logo" id="topbarTitle" data-i18n="deviceTitle">🎲 Dây Mồi Calculator</div>
+    <button class="nav-item" data-screen="dashboard"><span class="ni-icon">🏠</span><span data-i18n="navDashboard">Tổng quan</span></button>
+    <button class="nav-item" data-screen="analyzer"><span class="ni-icon">🎯</span><span data-i18n="navAnalyzer">Phân tích</span></button>
+    <button class="nav-item" data-screen="ai"><span class="ni-icon">📐</span><span data-i18n="navAI">Thống kê AI</span></button>
+    <button class="nav-item" data-screen="history"><span class="ni-icon">📜</span><span data-i18n="navHistory">Lịch sử</span></button>
+    <button class="nav-item" data-screen="settings"><span class="ni-icon">⚙️</span><span data-i18n="navSettings">Cài đặt</span></button>
+    <div class="sidebar-footer">
+      <a class="sidebar-community" href="https://discord.com/channels/1535092618801979474/1535092621892919417" target="_blank" rel="noopener noreferrer">
+        💬 <span data-i18n="communityMini">Cộng đồng Discord</span>
+      </a>
     </div>
-  </div>
+  </nav>
 
-  <a id="communityBanner" class="community-banner" href="https://discord.com/channels/1535092618801979474/1535092621892919417" target="_blank" rel="noopener noreferrer">
-    <span class="cb-icon">💬</span>
-    <span class="cb-text">
-      <span class="cb-title" data-i18n="communityTitle">Tham gia cộng đồng Discord</span>
-      <span class="cb-sub" data-i18n="communitySub">Trao đổi dây mồi, kết quả thực tế với người chơi khác</span>
-    </span>
-    <span class="cb-arrow">→</span>
-  </a>
-
-  <div class="card" style="animation-delay:.05s;">
-    <h2 data-i18n="chooseLevel">🎯 Chọn cấp muốn lên</h2>
-    <div id="targetPills" class="pill-row"></div>
-  </div>
-
-  <div class="card" style="animation-delay:.12s;">
-    <h2 data-i18n="enterChain">🎲 Nhập dây mồi</h2>
-    <input id="chainInput" type="text" placeholder="Ví dụ: 216524163267423" value="21232131" data-i18n-placeholder="chainPlaceholder" />
-    <div class="input-actions">
-      <button id="delOneBtn" class="mini-btn mb-neutral" data-i18n="delOne">⌫ Xóa 1 số</button>
-      <button id="clearAllBtn" class="mini-btn mb-neutral" data-i18n="clearAll">🗑 Xóa tất cả</button>
-    </div>
-    <div id="chipRow" class="chip-row"></div>
-
-    <div id="keypad">
-      <div class="keypad-grid">
-        <div class="key" data-d="1">1</div><div class="key" data-d="2">2</div><div class="key" data-d="3">3</div>
-        <div class="key" data-d="4">4</div><div class="key" data-d="5">5</div><div class="key" data-d="6">6</div>
-        <div class="key" data-d="7">7</div><div class="key" data-d="8">8</div><div class="key" data-d="9">9</div>
-        <div class="key key-zero" data-d="0">0</div><div class="key key-del" id="keyDel">✕</div>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-controls" style="margin-left:auto;">
+        <button id="langToggle" class="icon-btn" title="Switch language / Đổi ngôn ngữ" style="font-size:11px;font-weight:800;">VI</button>
+        <button id="deviceToggle" class="icon-btn" title="Đổi PC / Mobile">📱</button>
+        <button id="soundToggle" class="icon-btn" title="Bật/tắt âm thanh">🔊</button>
+        <button id="themeToggle" class="icon-btn" title="Đổi giao diện sáng/tối">☀️</button>
       </div>
     </div>
 
-    <div class="note" style="margin-top:12px;">
-      <span data-i18n="digitMeaning">Mỗi số = cấp mà thẻ mồi rớt về sau 1 lần đập xịt.</span>
-      <span id="chainLegendNote">
-        <span style="color:#6be08a;">■ 2,3 tăng tỷ lệ</span> ·
-        <span style="color:#e0a83f;">■ 4 giữ nguyên</span> ·
-        <span style="color:#e05b5b;">■ 5+ giảm tỷ lệ</span> ·
-        <span style="color:#ffd166;">■ 1 reset tích lũy</span>
-      </span>
+    <div class="wrap" id="mainWrap" style="display:flex;">
+
+      <!-- ① DASHBOARD -->
+      <section class="screen active" data-screen="dashboard">
+        <div class="hero-card" id="heroCard">
+          <div class="hero-label" data-i18n="heroLabel">🎯 TỈ LỆ ƯỚC TÍNH GẦN NHẤT</div>
+          <div class="hero-pct" id="heroPct">--%</div>
+          <div class="hero-diff" id="heroDiff"></div>
+          <div class="hero-bar-track"><div class="hero-bar-fill" id="heroBarFill" style="width:0%;"></div></div>
+          <div class="hero-conf-row">
+            <span data-i18n="heroConfLabel">Độ tin cậy</span>
+            <div class="hero-conf-track"><div class="hero-conf-fill" id="heroConfFill" style="width:0%;"></div></div>
+            <span id="heroConfPct">--</span>
+          </div>
+          <div class="hero-badges" id="heroBadges"></div>
+          <button class="hero-cta" id="heroCta" data-i18n="heroCta">✨ Đi tới Phân tích dây mồi</button>
+        </div>
+
+        <div class="stat-cards-row">
+          <div class="stat-card" style="animation-delay:.05s;"><div class="sc-icon">🎯</div><div class="sc-num" id="statTotal">0</div><div class="sc-label" data-i18n="statTotal">Lần lưu</div></div>
+          <div class="stat-card" style="animation-delay:.1s;"><div class="sc-icon">✅</div><div class="sc-num" id="statSuccess">0</div><div class="sc-label" data-i18n="statSuccess">Thành công</div></div>
+          <div class="stat-card" style="animation-delay:.15s;"><div class="sc-icon">❌</div><div class="sc-num" id="statFail">0</div><div class="sc-label" data-i18n="statFail">Thất bại</div></div>
+          <div class="stat-card" style="animation-delay:.2s;"><div class="sc-icon">📈</div><div class="sc-num" id="statAccuracy">--</div><div class="sc-label" data-i18n="statAccuracy">Tỷ lệ thực tế TB</div></div>
+        </div>
+
+        <a class="community-mini" href="https://discord.com/channels/1535092618801979474/1535092621892919417" target="_blank" rel="noopener noreferrer">
+          💬 <span data-i18n="communityTitle">Tham gia cộng đồng Discord</span><span class="cm-arrow">→</span>
+        </a>
+      </section>
+
+      <!-- ② ANALYZER -->
+      <section class="screen" data-screen="analyzer">
+        <div class="card" style="animation-delay:.05s;">
+          <h2 data-i18n="chooseLevel">🎯 Chọn cấp muốn lên</h2>
+          <div id="targetPills" class="pill-row"></div>
+        </div>
+
+        <div class="card" style="animation-delay:.12s;">
+          <h2 data-i18n="enterChain">🎲 Nhập dây mồi</h2>
+          <input id="chainInput" type="text" placeholder="Ví dụ: 216524163267423" value="21232131" data-i18n-placeholder="chainPlaceholder" />
+          <div class="input-actions">
+            <button id="delOneBtn" class="mini-btn mb-neutral" data-i18n="delOne">⌫ Xóa 1 số</button>
+            <button id="clearAllBtn" class="mini-btn mb-neutral" data-i18n="clearAll">🗑 Xóa tất cả</button>
+          </div>
+          <div id="chipRow" class="chip-row"></div>
+          <div id="quickAddRow" class="quick-add-row"></div>
+
+          <div id="keypad">
+            <div class="keypad-grid">
+              <div class="key" data-d="1">1</div><div class="key" data-d="2">2</div><div class="key" data-d="3">3</div>
+              <div class="key" data-d="4">4</div><div class="key" data-d="5">5</div><div class="key" data-d="6">6</div>
+              <div class="key" data-d="7">7</div><div class="key" data-d="8">8</div><div class="key" data-d="9">9</div>
+              <div class="key key-zero" data-d="0">0</div><div class="key key-del" id="keyDel">✕</div>
+            </div>
+          </div>
+
+          <div class="note" style="margin-top:12px;">
+            <span data-i18n="digitMeaning">Mỗi số = cấp mà thẻ mồi rớt về sau 1 lần đập xịt.</span>
+            <span id="chainLegendNote">
+              <span style="color:#6be08a;">■ 2,3 tăng tỷ lệ</span> ·
+              <span style="color:#e0a83f;">■ 4 giữ nguyên</span> ·
+              <span style="color:#e05b5b;">■ 5+ giảm tỷ lệ</span> ·
+              <span style="color:#ffd166;">■ 1 reset tích lũy</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="card gauge-card" id="gaugeCard" style="animation-delay:.19s;">
+          <h2 style="justify-content:center;" data-i18n="gaugeHeader">📊 Tỉ lệ thành công</h2>
+          <div class="gauge-wrap">
+            <span id="fireBadge" class="fire-badge">🔥</span>
+            <svg viewBox="0 0 220 160">
+              <defs>
+                <linearGradient id="gradHigh" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#7d5fe0"/><stop offset="55%" stop-color="#5a8cf0"/><stop offset="100%" stop-color="#4fd1c5"/>
+                </linearGradient>
+                <linearGradient id="gradMid" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#8a6fe0"/><stop offset="100%" stop-color="#e0a83f"/>
+                </linearGradient>
+                <linearGradient id="gradLow" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#e0973f"/><stop offset="100%" stop-color="#e0524f"/>
+                </linearGradient>
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <circle id="gaugeTrack" cx="110" cy="110" r="85" stroke="#241f3d" stroke-width="16" fill="none" stroke-linecap="round" transform="rotate(150 110 110)"/>
+              <circle id="gaugeArc" cx="110" cy="110" r="85" stroke="url(#gradHigh)" stroke-width="16" fill="none" stroke-linecap="round" filter="url(#glow)" transform="rotate(150 110 110)"/>
+            </svg>
+            <div class="gauge-center">
+              <div id="gaugePct" class="gauge-pct">--%</div>
+              <div id="gaugeTag" class="gauge-tag" data-i18n="gaugeWaiting">nhập dây mồi để xem</div>
+            </div>
+          </div>
+          <div class="gauge-minmax"><span>0%</span><span>100%</span></div>
+
+          <div id="badgeRow" class="badge-row"></div>
+          <div id="verdictBox" class="verdict verdict-mid" style="display:none;"></div>
+          <div id="breakdown" class="breakdown"></div>
+          <div id="confidenceBox" class="confidence-box"></div>
+          <details class="log-details">
+            <summary data-i18n="viewDetail">🧠 Tại sao lại ra con số này?</summary>
+            <div id="detailLogs"></div>
+          </details>
+
+          <input id="noteInput" type="text" class="note-input" placeholder="📝 Ghi chú (vd: tên cầu thủ)... — tuỳ chọn" data-i18n-placeholder="notePlaceholder">
+          <div class="action-row">
+            <button id="saveResultBtn" class="save-btn btn-save" disabled data-i18n="saveBtn">💾 Lưu kết quả</button>
+            <button id="simulateBtn" class="save-btn btn-sim" disabled data-i18n="simBtn">🎲 Thử nâng cấp</button>
+          </div>
+          <div class="sim-hint">* Nút "Thử nâng cấp" chỉ là mô phỏng xác suất cho vui theo % ước tính, không phải kết quả thật trong game.</div>
+        </div>
+      </section>
+
+      <!-- ③ AI / THỐNG KÊ -->
+      <section class="screen" data-screen="ai">
+        <div class="card" style="animation-delay:.05s;">
+          <h2 data-i18n="statsHeader">📈 Thống kê độ chính xác</h2>
+          <div id="calibBox"></div>
+          <div id="statsBox"></div>
+        </div>
+
+        <div class="card" style="animation-delay:.1s;">
+          <h2 data-i18n="digitEffectHeader">📊 Ảnh hưởng từng loại mồi</h2>
+          <select id="digitEffectLevel" class="digit-effect-select"></select>
+          <div id="digitEffectBox" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="card" style="animation-delay:.15s;">
+          <h2 data-i18n="learnHeader">🧠 Tự học từ dữ liệu</h2>
+
+          <h3 style="font-size:13px;color:var(--text-main);margin:0 0 8px;" data-i18n="coeffSection">🔧 Hệ số công thức</h3>
+          <div id="coeffCurrentBox" class="note"></div>
+          <button id="learnCoeffBtn" class="learn-btn" style="margin-top:10px;" data-i18n="learnCoeffBtn">🔍 Tính hệ số phù hợp hơn từ lịch sử</button>
+          <div id="coeffResultBox"></div>
+
+          <h3 style="font-size:13px;color:var(--text-main);margin:18px 0 8px;" data-i18n="patternSection">🧩 Mẫu dây mồi mới</h3>
+          <button id="learnPatternBtn" class="learn-btn" data-i18n="learnPatternBtn">🔎 Quét dữ liệu tìm mẫu dây mồi đẹp mới</button>
+          <div id="patternResultBox" style="margin-top:10px;"></div>
+        </div>
+      </section>
+
+      <!-- ④ HISTORY -->
+      <section class="screen" data-screen="history">
+        <div class="card" style="animation-delay:.05s;">
+          <div class="hist-header">
+            <h2 data-i18n="historyHeader">🕘 Lịch sử</h2>
+            <div class="hist-header-btns">
+              <button id="exportBtn" class="mini-btn mb-neutral" data-i18n="exportBtn">📤 Xuất JSON</button>
+              <button id="importBtn" class="mini-btn mb-neutral" data-i18n="importBtn">📥 Nhập JSON</button>
+              <input type="file" id="importInput" accept="application/json" style="display:none">
+              <button id="clearHistoryBtn" class="mini-btn" data-i18n="clearHistoryBtn">🗑 Xóa lịch sử</button>
+            </div>
+          </div>
+          <div class="hist-filters">
+            <select id="filterLevel"><option value="all" data-i18n="filterAllLevel">Tất cả cấp</option></select>
+            <select id="filterResult">
+              <option value="all" data-i18n="filterAllResult">Tất cả kết quả</option>
+              <option value="success" data-i18n="filterSuccess">✅ Chỉ thành công</option>
+              <option value="fail" data-i18n="filterFail">❌ Chỉ thất bại</option>
+              <option value="unrated" data-i18n="filterUnrated">⏳ Chưa đánh dấu</option>
+            </select>
+          </div>
+          <div id="historyList"></div>
+        </div>
+
+        <div class="card" style="animation-delay:.1s;">
+          <h2 data-i18n="levelStatsHeader">🎯 Thống kê theo từng cấp</h2>
+          <div id="levelStatsBox"></div>
+        </div>
+
+        <div class="card" style="animation-delay:.15s;">
+          <h2 data-i18n="chartHeader">📉 Biểu đồ dự đoán vs thực tế</h2>
+          <div id="chartBox" class="chart-wrap"></div>
+        </div>
+      </section>
+
+      <!-- ⑤ SETTINGS -->
+      <section class="screen" data-screen="settings">
+        <div class="card" style="animation-delay:.05s;">
+          <h2 data-i18n="settingsHeader">⚙️ Cài đặt</h2>
+          <p class="note" data-i18n="settingsHint">Đổi ngôn ngữ / thiết bị / âm thanh / giao diện sáng-tối ở góc trên bên phải.</p>
+        </div>
+
+        <div class="card" style="animation-delay:.1s;" id="baseTableCard">
+          <h2 data-i18n="baseTableHeader">📋 Bảng tỷ lệ gốc</h2>
+          <table>
+            <thead><tr><th>Cấp</th><th>OVR +</th><th>Tổng OVR</th><th>Tỷ lệ gốc</th></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <p class="note" style="margin-top:10px;" data-i18n="baseTableNote">
+            Đây là mô hình ước tính dựa trên kinh nghiệm cộng đồng ("dây mồi"), chưa được nhà phát hành xác nhận là cơ chế thật.
+            Số liệu chỉ mang tính tham khảo, không đảm bảo kết quả.
+          </p>
+        </div>
+      </section>
+
     </div>
   </div>
 
-  <div class="card gauge-card" id="gaugeCard" style="animation-delay:.19s;">
-    <h2 style="justify-content:center;" data-i18n="gaugeHeader">📊 Tỉ lệ thành công</h2>
-    <div class="gauge-wrap">
-      <span id="fireBadge" class="fire-badge">🔥</span>
-      <svg viewBox="0 0 220 160">
-        <defs>
-          <linearGradient id="gradHigh" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#7d5fe0"/><stop offset="55%" stop-color="#5a8cf0"/><stop offset="100%" stop-color="#4fd1c5"/>
-          </linearGradient>
-          <linearGradient id="gradMid" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#8a6fe0"/><stop offset="100%" stop-color="#e0a83f"/>
-          </linearGradient>
-          <linearGradient id="gradLow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#e0973f"/><stop offset="100%" stop-color="#e0524f"/>
-          </linearGradient>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <circle id="gaugeTrack" cx="110" cy="110" r="85" stroke="#241f3d" stroke-width="16" fill="none" stroke-linecap="round" transform="rotate(150 110 110)"/>
-        <circle id="gaugeArc" cx="110" cy="110" r="85" stroke="url(#gradHigh)" stroke-width="16" fill="none" stroke-linecap="round" filter="url(#glow)" transform="rotate(150 110 110)"/>
-      </svg>
-      <div class="gauge-center">
-        <div id="gaugePct" class="gauge-pct">--%</div>
-        <div id="gaugeTag" class="gauge-tag" data-i18n="gaugeWaiting">nhập dây mồi để xem</div>
-      </div>
-    </div>
-    <div class="gauge-minmax"><span>0%</span><span>100%</span></div>
-
-    <div id="badgeRow" class="badge-row"></div>
-    <div id="verdictBox" class="verdict verdict-mid" style="display:none;"></div>
-    <div id="breakdown" class="breakdown"></div>
-    <div id="confidenceBox" class="confidence-box"></div>
-    <details class="log-details">
-      <summary data-i18n="viewDetail">🧠 Tại sao lại ra con số này?</summary>
-      <div id="detailLogs"></div>
-    </details>
-
-    <input id="noteInput" type="text" class="note-input" placeholder="📝 Ghi chú (vd: tên cầu thủ)... — tuỳ chọn" data-i18n-placeholder="notePlaceholder">
-    <div class="action-row">
-      <button id="saveResultBtn" class="save-btn btn-save" disabled data-i18n="saveBtn">💾 Lưu kết quả</button>
-      <button id="simulateBtn" class="save-btn btn-sim" disabled data-i18n="simBtn">🎲 Thử nâng cấp</button>
-    </div>
-    <div class="sim-hint">* Nút "Thử nâng cấp" chỉ là mô phỏng xác suất cho vui theo % ước tính, không phải kết quả thật trong game.</div>
-  </div>
-
-  <div class="card" style="animation-delay:.26s;">
-    <div class="hist-header">
-      <h2 data-i18n="historyHeader">🕘 Lịch sử</h2>
-      <div class="hist-header-btns">
-        <button id="exportBtn" class="mini-btn mb-neutral" data-i18n="exportBtn">📤 Xuất JSON</button>
-        <button id="importBtn" class="mini-btn mb-neutral" data-i18n="importBtn">📥 Nhập JSON</button>
-        <input type="file" id="importInput" accept="application/json" style="display:none">
-        <button id="clearHistoryBtn" class="mini-btn" data-i18n="clearHistoryBtn">🗑 Xóa lịch sử</button>
-      </div>
-    </div>
-    <div class="hist-filters">
-      <select id="filterLevel"><option value="all" data-i18n="filterAllLevel">Tất cả cấp</option></select>
-      <select id="filterResult">
-        <option value="all" data-i18n="filterAllResult">Tất cả kết quả</option>
-        <option value="success" data-i18n="filterSuccess">✅ Chỉ thành công</option>
-        <option value="fail" data-i18n="filterFail">❌ Chỉ thất bại</option>
-        <option value="unrated" data-i18n="filterUnrated">⏳ Chưa đánh dấu</option>
-      </select>
-    </div>
-    <div id="historyList"></div>
-  </div>
-
-  <div class="card" style="animation-delay:.33s;">
-    <h2 data-i18n="statsHeader">📈 Thống kê độ chính xác</h2>
-    <div id="calibBox"></div>
-    <div id="statsBox"></div>
-  </div>
-
-  <div class="card" style="animation-delay:.38s;">
-    <h2 data-i18n="levelStatsHeader">🎯 Thống kê theo từng cấp</h2>
-    <div id="levelStatsBox"></div>
-  </div>
-
-  <div class="card" style="animation-delay:.40s;">
-    <h2 data-i18n="digitEffectHeader">📊 Ảnh hưởng từng loại mồi</h2>
-    <select id="digitEffectLevel" class="digit-effect-select"></select>
-    <div id="digitEffectBox" style="margin-top:10px;"></div>
-  </div>
-
-  <div class="card" style="animation-delay:.43s;">
-    <h2 data-i18n="chartHeader">📉 Biểu đồ dự đoán vs thực tế</h2>
-    <div id="chartBox" class="chart-wrap"></div>
-  </div>
-
-  <div class="card" style="animation-delay:.48s;">
-    <h2 data-i18n="learnHeader">🧠 Tự học từ dữ liệu</h2>
-
-    <h3 style="font-size:13px;color:var(--text-main);margin:0 0 8px;" data-i18n="coeffSection">🔧 Hệ số công thức</h3>
-    <div id="coeffCurrentBox" class="note"></div>
-    <button id="learnCoeffBtn" class="learn-btn" style="margin-top:10px;" data-i18n="learnCoeffBtn">🔍 Tính hệ số phù hợp hơn từ lịch sử</button>
-    <div id="coeffResultBox"></div>
-
-    <h3 style="font-size:13px;color:var(--text-main);margin:18px 0 8px;" data-i18n="patternSection">🧩 Mẫu dây mồi mới</h3>
-    <button id="learnPatternBtn" class="learn-btn" data-i18n="learnPatternBtn">🔎 Quét dữ liệu tìm mẫu dây mồi đẹp mới</button>
-    <div id="patternResultBox" style="margin-top:10px;"></div>
-  </div>
-
-  <div class="card" style="animation-delay:.54s;" id="baseTableCard">
-    <h2 data-i18n="baseTableHeader">📋 Bảng tỷ lệ gốc</h2>
-    <table>
-      <thead><tr><th>Cấp</th><th>OVR +</th><th>Tổng OVR</th><th>Tỷ lệ gốc</th></tr></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-    <p class="note" style="margin-top:10px;">
-      Đây là mô hình ước tính dựa trên kinh nghiệm cộng đồng ("dây mồi"), chưa được nhà phát hành xác nhận là cơ chế thật.
-      Số liệu chỉ mang tính tham khảo, không đảm bảo kết quả.
-    </p>
-  </div>
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bn-item" data-screen="dashboard"><span class="bn-icon">🏠</span><span data-i18n="navDashboard">Tổng quan</span></button>
+    <button class="bn-item" data-screen="analyzer"><span class="bn-icon">🎯</span><span data-i18n="navAnalyzer">Phân tích</span></button>
+    <button class="bn-item" data-screen="ai"><span class="bn-icon">📐</span><span data-i18n="navAI">Thống kê AI</span></button>
+    <button class="bn-item" data-screen="history"><span class="bn-icon">📜</span><span data-i18n="navHistory">Lịch sử</span></button>
+    <button class="bn-item" data-screen="settings"><span class="bn-icon">⚙️</span><span data-i18n="navSettings">Cài đặt</span></button>
+  </nav>
 
 </div>
 
@@ -650,6 +803,17 @@ const STRINGS = {
   vi: {
     deviceTitle: '🎲 Dây Mồi Calculator',
     communityTitle: 'Tham gia cộng đồng Discord',
+    navDashboard: 'Tổng quan', navAnalyzer: 'Phân tích', navAI: 'Thống kê AI', navHistory: 'Lịch sử', navSettings: 'Cài đặt',
+    communityMini: 'Cộng đồng Discord',
+    heroLabel: '🎯 TỈ LỆ ƯỚC TÍNH GẦN NHẤT',
+    heroCta: '✨ Đi tới Phân tích dây mồi',
+    heroConfLabel: 'Độ tin cậy',
+    heroNoData: 'Chưa có lần tính nào — sang Phân tích để bắt đầu.',
+    heroVsBase: 'so với tỷ lệ gốc',
+    heroSampleBadge: '📊 {n} mẫu',
+    statTotal: 'Lần lưu', statSuccess: 'Thành công', statFail: 'Thất bại', statAccuracy: 'Tỷ lệ thực tế TB',
+    settingsHeader: '⚙️ Cài đặt',
+    settingsHint: 'Đổi ngôn ngữ / thiết bị / âm thanh / giao diện sáng-tối ở góc trên bên phải.',
     communitySub: 'Trao đổi dây mồi, kết quả thực tế với người chơi khác',
     deviceSubtitle: 'Bạn đang dùng thiết bị nào?',
     devicePC: '💻 Máy tính (PC)', devicePCsub: 'Gõ dây mồi bằng bàn phím thường',
@@ -747,6 +911,17 @@ const STRINGS = {
   en: {
     deviceTitle: '🎲 Bait Chain Calculator',
     communityTitle: 'Join our Discord community',
+    navDashboard: 'Dashboard', navAnalyzer: 'Analyzer', navAI: 'AI Stats', navHistory: 'History', navSettings: 'Settings',
+    communityMini: 'Discord community',
+    heroLabel: '🎯 LATEST ESTIMATED RATE',
+    heroCta: '✨ Go to Bait Analyzer',
+    heroConfLabel: 'Confidence',
+    heroNoData: 'No calculation yet — head to Analyzer to start.',
+    heroVsBase: 'vs base rate',
+    heroSampleBadge: '📊 {n} samples',
+    statTotal: 'Saved', statSuccess: 'Success', statFail: 'Fail', statAccuracy: 'Avg actual rate',
+    settingsHeader: '⚙️ Settings',
+    settingsHint: 'Change language / device / sound / theme from the top-right icons.',
     communitySub: 'Share bait chains and real results with other players',
     deviceSubtitle: 'Which device are you using?',
     devicePC: '💻 Computer (PC)', devicePCsub: 'Type using a regular keyboard',
@@ -1009,7 +1184,93 @@ function renderHistory() {
   }).join('');
 }
 
-function refreshAnalytics() { renderStats(); renderStatsByLevel(); renderCalibration(); renderChart(); renderDigitEffects(); }
+function refreshAnalytics() { renderStats(); renderStatsByLevel(); renderCalibration(); renderChart(); renderDigitEffects(); renderStatCards(); }
+
+/* ===== Điều hướng màn hình (sidebar desktop / bottom-nav mobile) ===== */
+let activeScreen = 'dashboard';
+function switchScreen(key) {
+  activeScreen = key;
+  try { localStorage.setItem('dayMoiScreen', key); } catch (e) {}
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === key));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.screen === key));
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.toggle('active', b.dataset.screen === key));
+  document.getElementById('mainWrap').scrollTop = 0;
+  window.scrollTo(0, 0);
+  if (key === 'dashboard') renderHero();
+}
+
+/* ===== Hero card (Dashboard) ===== */
+function renderHero() {
+  const pctEl = document.getElementById('heroPct');
+  const diffEl = document.getElementById('heroDiff');
+  const barEl = document.getElementById('heroBarFill');
+  const confFillEl = document.getElementById('heroConfFill');
+  const confPctEl = document.getElementById('heroConfPct');
+  const badgesEl = document.getElementById('heroBadges');
+
+  let source = currentResult;
+  if (!source && history.length) {
+    const last = history[history.length - 1];
+    source = { target: last.target, rate: last.rate };
+  }
+  if (!source) {
+    pctEl.textContent = '--%';
+    diffEl.textContent = t('heroNoData');
+    diffEl.style.color = 'var(--text-muted)';
+    barEl.style.width = '0%';
+    confFillEl.style.width = '0%';
+    confPctEl.textContent = '--';
+    badgesEl.innerHTML = '';
+    return;
+  }
+  const stepRow = levels.find(r => r.to === source.target);
+  const baseRate = stepRow ? stepRow.rate : 0;
+  const diff = source.rate - baseRate;
+  pctEl.textContent = source.rate.toFixed(1) + '%';
+  diffEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% ' + t('heroVsBase');
+  diffEl.style.color = diff >= 0 ? '#8ef0b0' : '#ff9d9d';
+  barEl.style.width = Math.max(2, Math.min(100, source.rate)) + '%';
+
+  const sameLevel = history.filter(h => h.result && h.target === source.target);
+  const n = sameLevel.length;
+  const tier = reliabilityTier(n);
+  confFillEl.style.width = tier.pct + '%';
+  confPctEl.textContent = t(BUCKET_LABEL_KEY[source.rate >= 60 ? 'high' : source.rate >= 30 ? 'mid' : 'low']).replace(/^[^\s]+\s/, '');
+
+  const badges = [];
+  if (source.rate >= 60) badges.push(['badge-green', t('rateBadgeHigh')]);
+  else if (source.rate >= 30) badges.push(['badge-yellow', t('rateBadgeMid')]);
+  else badges.push(['badge-red', t('rateBadgeLow')]);
+  badges.push(['badge-' + (tier.key === 'vhigh' || tier.key === 'high' ? 'green' : tier.key === 'mid' ? 'yellow' : 'red'), t('confTier_' + tier.key)]);
+  badges.push(['badge-yellow', t('heroSampleBadge', { n })]);
+  badgesEl.innerHTML = badges.map(([cls, label]) => `<span class="badge ${cls}">${label}</span>`).join('');
+}
+
+/* ===== Stat cards (Dashboard) ===== */
+function renderStatCards() {
+  const total = history.length;
+  const success = history.filter(h => h.result === 'success').length;
+  const fail = history.filter(h => h.result === 'fail').length;
+  const stats = computeStats();
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statSuccess').textContent = success;
+  document.getElementById('statFail').textContent = fail;
+  document.getElementById('statAccuracy').textContent = stats ? stats.avgActual.toFixed(0) + '%' : '--';
+}
+
+/* ===== Quick-add pill (1-9) cạnh ô nhập dây mồi ===== */
+function renderQuickAddPills() {
+  const row = document.getElementById('quickAddRow');
+  row.innerHTML = '';
+  for (let d = 1; d <= 9; d++) {
+    const btn = document.createElement('button');
+    btn.className = 'qa-pill ' + (d === 1 ? 'd-reset' : d === 4 ? 'd-neu' : d < 4 ? 'd-up' : 'd-down');
+    btn.textContent = d;
+    btn.addEventListener('click', () => { chainInput.value += d; renderChips(); calculate(); });
+    row.appendChild(btn);
+  }
+}
+
 
 function setResult(id, result) {
   const item = history.find(h => h.id === id);
@@ -1237,6 +1498,7 @@ function renderChart() {
   });
 
   const predictedPts = data.map((h, i) => `${xAt(i)},${yAt(h.rate)}`).join(' ');
+  const areaPts = `${xAt(0)},${yAt(0)} ${predictedPts} ${xAt(n - 1)},${yAt(0)}`;
   const rollingPts = rollingActual.map((v, i) => `${xAt(i)},${yAt(v)}`).join(' ');
   const dots = data.map((h, i) =>
     `<circle cx="${xAt(i)}" cy="${yAt(h.result === 'success' ? 100 : 0)}" r="4" fill="${h.result === 'success' ? '#2fbf83' : '#e05b5b'}" stroke="#0d0b17" stroke-width="1"/>`
@@ -1249,7 +1511,14 @@ function renderChart() {
 
   box.innerHTML = `
     <svg viewBox="0 0 ${W} ${H}">
+      <defs>
+        <linearGradient id="chartAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#7d5fe0" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#7d5fe0" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
       ${gridLines}
+      <polygon points="${areaPts}" fill="url(#chartAreaGrad)"/>
       <polyline points="${predictedPts}" fill="none" stroke="#7d5fe0" stroke-width="2.5"/>
       <polyline points="${rollingPts}" fill="none" stroke="#e0a83f" stroke-width="2" stroke-dasharray="5 4"/>
       ${dots}
@@ -1468,6 +1737,16 @@ function init() {
     chooseDevice(savedDevice);
   }
 
+  document.querySelectorAll('.nav-item, .bn-item').forEach(btn => {
+    btn.addEventListener('click', () => switchScreen(btn.dataset.screen));
+  });
+  document.getElementById('heroCta').addEventListener('click', () => switchScreen('analyzer'));
+  renderQuickAddPills();
+
+  let savedScreen = 'dashboard';
+  try { savedScreen = localStorage.getItem('dayMoiScreen') || 'dashboard'; } catch (e) {}
+  switchScreen(savedScreen);
+
   initGaugeTrack();
   renderTargetPills();
   renderChips();
@@ -1484,7 +1763,7 @@ function chooseDevice(mode) {
   deviceMode = mode;
   try { localStorage.setItem('dayMoiDevice', mode); } catch (e) {}
   document.getElementById('deviceChooser').style.display = 'none';
-  document.getElementById('mainWrap').style.display = 'flex';
+  document.getElementById('appShell').style.display = 'flex';
   if (mode === 'mobile') {
     document.body.classList.add('is-mobile');
     chainInput.setAttribute('readonly', 'readonly');
@@ -1695,6 +1974,7 @@ function calculate() {
     lastRate = null; wasHigh = false;
     currentResult = null;
     saveBtn.disabled = true; simulateBtn.disabled = true;
+    renderHero();
     return;
   }
 
@@ -1755,6 +2035,7 @@ function calculate() {
     · ${LANG === 'vi' ? 'Chuỗi hiệu lực' : 'Active chain'}: <b>${dyn.activeChain || (LANG === 'vi' ? '(rỗng)' : '(empty)')}</b>`;
 
   renderExplainPanel(baseRate, dyn, tail, totalAdjust, finalRate);
+  renderHero();
 }
 
 function renderExplainPanel(baseRate, dyn, tail, totalAdjust, finalRate) {
