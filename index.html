@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   * { box-sizing: border-box; }
   :root {
@@ -63,6 +64,7 @@
     width: 34px; height: 34px; border-radius: 10px; background: var(--pill-bg); border: 1px solid var(--pill-border);
     cursor: pointer; font-size: 16px; color: var(--text-main); transition: transform .15s;
   }
+  body.no-motion, body.no-motion * { animation: none !important; transition: none !important; }
   .icon-btn:active { transform: scale(.9); }
 
   .community-banner {
@@ -84,20 +86,27 @@
   /* ===== App shell: sidebar (desktop) + bottom nav (mobile) ===== */
   .app-shell { display: flex; align-items: flex-start; min-height: 100vh; }
   .sidebar-nav {
-    width: 208px; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+    width: 236px; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
     background: var(--card-bg); backdrop-filter: blur(16px); border-right: 1px solid var(--card-border);
-    padding: 20px 12px; display: flex; flex-direction: column; gap: 4px;
+    padding: 22px 14px; display: flex; flex-direction: column; gap: 4px;
   }
-  .sidebar-logo { font-weight: 800; font-size: 15px; color: var(--text-main); padding: 0 8px 16px; }
-  .sidebar-logo small { display: block; font-size: 10px; color: var(--text-faint); font-weight: 500; margin-top: 2px; }
+  .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0 8px 22px; }
+  .sidebar-logo .lg-mark {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg,#7d5fe0,#4fd1c5); display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 15px; box-shadow: 0 4px 14px rgba(124,90,224,.4);
+  }
+  .sidebar-logo .lg-text { font-weight: 800; font-size: 14px; color: var(--text-main); line-height: 1.3; }
+  .sidebar-logo .lg-text small { display: block; font-size: 9px; color: var(--text-faint); font-weight: 600; letter-spacing: .6px; text-transform: uppercase; }
   .nav-item {
-    display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 10px;
+    display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 11px;
     color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; background: none; border: none;
     text-align: left; width: 100%; transition: background .15s, color .15s;
   }
-  .nav-item .ni-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item .ni-icon { width: 19px; height: 19px; flex-shrink: 0; }
+  .nav-item .ni-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .nav-item:hover { background: rgba(124,90,224,.12); color: var(--text-main); }
-  .nav-item.active { background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; }
+  .nav-item.active { background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; box-shadow: 0 4px 16px rgba(124,90,224,.4); }
   .sidebar-footer { margin-top: auto; padding-top: 12px; }
   .sidebar-community {
     display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 10px;
@@ -106,62 +115,128 @@
   }
 
   .main-area { flex: 1; min-width: 0; padding: 20px 20px 24px; }
-  @media (max-width: 899px) { .main-area { padding-bottom: 88px; } .sidebar-nav { display: none; } }
+  @media (max-width: 899px) { .main-area { padding-bottom: 90px; } .sidebar-nav { display: none; } }
 
   .bottom-nav {
     display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
     background: var(--card-bg); backdrop-filter: blur(16px); border-top: 1px solid var(--card-border);
-    padding: 6px 4px; justify-content: space-around;
+    padding: 8px 6px; justify-content: space-around;
   }
   @media (max-width: 899px) { .bottom-nav { display: flex; } }
   .bn-item {
-    display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: none;
-    color: var(--text-faint); font-size: 9px; font-weight: 700; padding: 6px 4px; border-radius: 10px; flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none;
+    color: var(--text-faint); font-size: 9px; font-weight: 700; padding: 6px 8px; border-radius: 12px; flex: 1;
+    transition: background .15s, color .15s;
   }
-  .bn-item .bn-icon { font-size: 18px; }
-  .bn-item.active { color: #cbb8ff; }
-  .bn-item.active .bn-icon { transform: scale(1.1); }
+  .bn-item .bn-icon { width: 19px; height: 19px; }
+  .bn-item .bn-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .bn-item.active { color: #cbb8ff; background: rgba(124,90,224,.18); box-shadow: 0 0 0 1px rgba(124,90,224,.3); }
 
   .screen { display: none; }
   .screen.active { display: flex; flex-direction: column; gap: 16px; }
 
   /* ===== Hero card ===== */
   .hero-card {
+    position: relative; overflow: hidden;
     background: linear-gradient(150deg, rgba(124,90,224,.25), rgba(79,209,197,.12)), var(--card-bg);
-    border: 1px solid rgba(124,90,224,.3); border-radius: 20px; padding: 22px;
+    border: 1px solid rgba(124,90,224,.3); border-radius: 20px; padding: 24px 22px;
     text-align: center; box-shadow: 0 10px 32px rgba(124,90,224,.2);
     animation: fadeSlideUp .5s ease both;
   }
-  .hero-label { font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: .5px; }
-  .hero-pct { font-size: 52px; font-weight: 900; margin: 4px 0; background: linear-gradient(135deg,#cbb8ff,#8ef0b0); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .hero-diff { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
-  .hero-bar-track { width: 100%; height: 10px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 14px; }
+  .hero-top-row { display: flex; justify-content: space-between; align-items: center; }
+  .hero-label { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+  .hero-diff-badge { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; }
+  .hero-glow {
+    position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
+    width: 260px; height: 260px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(124,90,224,.5) 0%, rgba(79,209,197,.15) 45%, transparent 70%);
+    filter: blur(6px); z-index: 0;
+  }
+  .hero-pct-wrap { position: relative; z-index: 1; }
+  .hero-pct { font-size: 56px; font-weight: 900; margin: 10px 0 0; line-height: 1; background: linear-gradient(135deg,#cbb8ff,#8ef0b0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-sub-label { font-size: 10px; font-weight: 700; color: var(--text-faint); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+  .hero-bar-track { width: 100%; height: 10px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 14px; position: relative; z-index: 1; }
   .hero-bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg,#7d5fe0,#4fd1c5); transition: width .6s ease; }
-  .hero-conf-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
-  .hero-conf-track { flex: 1; height: 6px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .hero-conf-row { display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 11px; color: var(--text-muted); margin-bottom: 16px; font-weight: 700; position: relative; z-index: 1; }
+  .hero-conf-row .hc-item { display: flex; align-items: center; gap: 6px; }
+  .hero-conf-track { width: 60px; height: 6px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; }
   .hero-conf-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#5a8cf0,#8ef0b0); transition: width .6s ease; }
-  .hero-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .hero-badges { display: none; }
   .hero-cta {
-    width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 700; font-size: 13px;
-    background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; cursor: pointer;
+    width: 100%; padding: 13px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; letter-spacing: .3px;
+    background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; cursor: pointer; position: relative; z-index: 1;
+    box-shadow: 0 6px 20px rgba(124,90,224,.35);
   }
 
   /* ===== Stat cards ===== */
-  .stat-cards-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-cards-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   @media (min-width: 480px) { .stat-cards-row { grid-template-columns: repeat(4, 1fr); } }
   .stat-card {
-    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 10px;
-    text-align: center; animation: fadeSlideUp .5s ease both;
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 11px 8px;
+    text-align: center; animation: fadeSlideUp .5s ease both; opacity: .92;
   }
-  .stat-card .sc-icon { font-size: 18px; }
-  .stat-card .sc-num { font-size: 22px; font-weight: 800; color: var(--text-main); font-family: 'JetBrains Mono','Consolas',monospace; margin: 2px 0; }
-  .stat-card .sc-label { font-size: 10px; color: var(--text-muted); }
+  .stat-card .sc-icon { font-size: 14px; opacity: .7; }
+  .stat-card .sc-num { font-size: 17px; font-weight: 800; color: var(--text-main); font-family: 'JetBrains Mono','Consolas',monospace; margin: 2px 0; }
+  .stat-card .sc-label { font-size: 9px; color: var(--text-faint); }
 
   .community-mini {
     display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 12px 14px; border-radius: 14px;
     background: rgba(88,101,242,.15); border: 1px solid rgba(88,101,242,.35); color: #a9b3ff; font-size: 12px; font-weight: 700;
   }
   .community-mini .cm-arrow { margin-left: auto; }
+
+  /* ===== Settings Center ===== */
+  .settings-section-title {
+    font-size: 11px; font-weight: 800; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase;
+    margin: 0 0 4px;
+  }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--card-border);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row .sr-label { font-size: 13px; font-weight: 700; color: var(--text-main); }
+  .setting-row .sr-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .setting-row .sr-value {
+    display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-muted);
+    background: var(--pill-bg); border: 1px solid var(--pill-border); padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .setting-row .sr-value:hover { border-color: #6c4fd1; }
+
+  .toggle-switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; cursor: pointer; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: rgba(255,255,255,.15); border-radius: 999px; transition: background .2s; }
+  .toggle-knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+  .toggle-switch input:checked + .toggle-track { background: linear-gradient(135deg,#7d5fe0,#5a3fc0); }
+  .toggle-switch input:checked + .toggle-track .toggle-knob { transform: translateX(18px); }
+
+  .settings-data-summary { display: flex; gap: 16px; padding: 10px 0; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
+  .settings-data-summary b { color: var(--text-main); font-family: 'JetBrains Mono','Consolas',monospace; }
+  .settings-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .settings-danger-note { font-size: 11px; color: #ff9d9d; margin-top: 8px; }
+
+  .about-box { text-align: center; padding: 6px 0; }
+  .about-box .ab-mark {
+    width: 42px; height: 42px; border-radius: 12px; margin: 0 auto 10px;
+    background: linear-gradient(135deg,#7d5fe0,#4fd1c5); display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 17px;
+  }
+  .about-box .ab-name { font-weight: 800; font-size: 14px; color: var(--text-main); }
+  .about-box .ab-tag { font-size: 11px; color: var(--text-faint); margin-top: 2px; letter-spacing: .5px; }
+  .about-box .ab-ver { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+  .about-links { display: flex; justify-content: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+  .about-links a, .about-links span { font-size: 11px; color: #a9b3ff; text-decoration: none; font-weight: 700; cursor: pointer; }
+  .about-links a:hover, .about-links span:hover { text-decoration: underline; }
+
+  /* ===== Tài khoản (Google Sign-In) ===== */
+  .account-signedout { text-align: center; padding: 6px 0; }
+  #googleSignInBtn { display: flex; justify-content: center; margin-top: 10px; }
+  .account-signedin { display: none; align-items: center; gap: 12px; padding: 4px 0; }
+  .account-signedin img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(124,90,224,.4); }
+  .account-signedin .ai-info { flex: 1; min-width: 0; }
+  .account-signedin .ai-name { font-weight: 800; font-size: 13px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .account-signedin .ai-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gsi-config-note { font-size: 11px; color: var(--text-muted); background: rgba(255,255,255,.03); border-radius: 10px; padding: 10px 12px; text-align: left; line-height: 1.6; }
 
   .quick-add-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .qa-pill {
@@ -484,12 +559,15 @@
 <div class="app-shell" id="appShell" style="display:none;">
 
   <nav class="sidebar-nav" id="sidebarNav">
-    <div class="sidebar-logo" id="topbarTitle" data-i18n="deviceTitle">🎲 Dây Mồi Calculator</div>
-    <button class="nav-item" data-screen="dashboard"><span class="ni-icon">🏠</span><span data-i18n="navDashboard">Tổng quan</span></button>
-    <button class="nav-item" data-screen="analyzer"><span class="ni-icon">🎯</span><span data-i18n="navAnalyzer">Phân tích</span></button>
-    <button class="nav-item" data-screen="ai"><span class="ni-icon">📐</span><span data-i18n="navAI">Thống kê AI</span></button>
-    <button class="nav-item" data-screen="history"><span class="ni-icon">📜</span><span data-i18n="navHistory">Lịch sử</span></button>
-    <button class="nav-item" data-screen="settings"><span class="ni-icon">⚙️</span><span data-i18n="navSettings">Cài đặt</span></button>
+    <div class="sidebar-logo">
+      <div class="lg-mark">◈</div>
+      <div class="lg-text"><span id="topbarTitle" data-i18n="logoText">Dây Mồi</span><small data-i18n="deviceSubtitleSmall">Ước tính thống kê</small></div>
+    </div>
+    <button class="nav-item" data-screen="dashboard"><span class="ni-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V10"/></svg></span><span data-i18n="navDashboard">Tổng quan</span></button>
+    <button class="nav-item" data-screen="analyzer"><span class="ni-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></span><span data-i18n="navAnalyzer">Phân tích</span></button>
+    <button class="nav-item" data-screen="ai"><span class="ni-icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="13" width="3.5" height="7" rx="1"/><rect x="10.2" y="7" width="3.5" height="13" rx="1"/><rect x="17" y="10" width="3.5" height="10" rx="1"/></svg></span><span data-i18n="navAI">Thống kê AI</span></button>
+    <button class="nav-item" data-screen="history"><span class="ni-icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/></svg></span><span data-i18n="navHistory">Lịch sử</span></button>
+    <button class="nav-item" data-screen="settings"><span class="ni-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M3 12h2.5M18.5 12H21M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></span><span data-i18n="navSettings">Cài đặt</span></button>
     <div class="sidebar-footer">
       <a class="sidebar-community" href="https://discord.com/channels/1535092618801979474/1535092621892919417" target="_blank" rel="noopener noreferrer">
         💬 <span data-i18n="communityMini">Cộng đồng Discord</span>
@@ -500,9 +578,9 @@
   <div class="main-area">
     <div class="topbar">
       <div class="topbar-controls" style="margin-left:auto;">
-        <button id="langToggle" class="icon-btn" title="Switch language / Đổi ngôn ngữ" style="font-size:11px;font-weight:800;">VI</button>
-        <button id="deviceToggle" class="icon-btn" title="Đổi PC / Mobile">📱</button>
-        <button id="soundToggle" class="icon-btn" title="Bật/tắt âm thanh">🔊</button>
+        <button id="langToggle" class="icon-btn" title="Switch language / Đổi ngôn ngữ" style="font-size:11px;font-weight:800;display:none;">VI</button>
+        <button id="deviceToggle" class="icon-btn" title="Đổi PC / Mobile" style="display:none;">📱</button>
+        <button id="soundToggle" class="icon-btn" title="Bật/tắt âm thanh" style="display:none;">🔊</button>
         <button id="themeToggle" class="icon-btn" title="Đổi giao diện sáng/tối">☀️</button>
       </div>
     </div>
@@ -512,16 +590,24 @@
       <!-- ① DASHBOARD -->
       <section class="screen active" data-screen="dashboard">
         <div class="hero-card" id="heroCard">
-          <div class="hero-label" data-i18n="heroLabel">🎯 TỈ LỆ ƯỚC TÍNH GẦN NHẤT</div>
-          <div class="hero-pct" id="heroPct">--%</div>
-          <div class="hero-diff" id="heroDiff"></div>
+          <div class="hero-glow"></div>
+          <div class="hero-top-row">
+            <div class="hero-label" data-i18n="heroLabel">🎯 TỈ LỆ ƯỚC TÍNH GẦN NHẤT</div>
+            <div class="hero-diff-badge" id="heroDiff">--</div>
+          </div>
+          <div class="hero-pct-wrap">
+            <div class="hero-pct" id="heroPct">--%</div>
+            <div class="hero-sub-label" data-i18n="heroSubLabel">Tỷ lệ ước tính</div>
+          </div>
           <div class="hero-bar-track"><div class="hero-bar-fill" id="heroBarFill" style="width:0%;"></div></div>
           <div class="hero-conf-row">
-            <span data-i18n="heroConfLabel">Độ tin cậy</span>
-            <div class="hero-conf-track"><div class="hero-conf-fill" id="heroConfFill" style="width:0%;"></div></div>
-            <span id="heroConfPct">--</span>
+            <div class="hc-item">
+              <span data-i18n="heroConfLabel">Độ tin cậy</span>
+              <div class="hero-conf-track"><div class="hero-conf-fill" id="heroConfFill" style="width:0%;"></div></div>
+              <span id="heroConfPct">--</span>
+            </div>
+            <div class="hc-item" id="heroSampleText">-- <span data-i18n="heroSamplesWord">mẫu</span></div>
           </div>
-          <div class="hero-badges" id="heroBadges"></div>
           <button class="hero-cta" id="heroCta" data-i18n="heroCta">✨ Đi tới Phân tích dây mồi</button>
         </div>
 
@@ -688,10 +774,114 @@
       <section class="screen" data-screen="settings">
         <div class="card" style="animation-delay:.05s;">
           <h2 data-i18n="settingsHeader">⚙️ Cài đặt</h2>
-          <p class="note" data-i18n="settingsHint">Đổi ngôn ngữ / thiết bị / âm thanh / giao diện sáng-tối ở góc trên bên phải.</p>
+          <p class="note" data-i18n="settingsHint">Quản lý giao diện, trải nghiệm và dữ liệu.</p>
         </div>
 
-        <div class="card" style="animation-delay:.1s;" id="baseTableCard">
+        <div class="card" style="animation-delay:.07s;">
+          <div class="settings-section-title" data-i18n="settingsAccount">TÀI KHOẢN</div>
+
+          <div id="accountSignedOut" class="account-signedout">
+            <p class="note" data-i18n="accountIntro">Đăng nhập bằng Google để hiển thị tên/email của bạn trong app. Lưu ý: dữ liệu vẫn chỉ lưu trên máy này, đăng nhập không đồng bộ giữa các thiết bị.</p>
+            <div id="googleSignInBtn"></div>
+            <div id="gsiConfigNote" class="gsi-config-note" style="display:none;margin-top:10px;"></div>
+          </div>
+
+          <div id="accountSignedIn" class="account-signedin">
+            <img id="accountAvatar" src="" alt="avatar">
+            <div class="ai-info">
+              <div class="ai-name" id="accountName"></div>
+              <div class="ai-email" id="accountEmail"></div>
+            </div>
+            <button id="signOutBtn" class="mini-btn mb-neutral" data-i18n="signOutBtn">Đăng xuất</button>
+          </div>
+        </div>
+
+        <div class="card" style="animation-delay:.08s;">
+          <div class="settings-section-title" data-i18n="settingsAppearance">GIAO DIỆN</div>
+          <div class="setting-row">
+            <div class="sr-label" data-i18n="settingsThemeRow">Chế độ giao diện</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="sr-value" id="settingsThemeLabel" style="cursor:default;">🌙 Dark</span>
+              <label class="toggle-switch"><input type="checkbox" id="settingsThemeSwitch"><span class="toggle-track"><span class="toggle-knob"></span></span></label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div>
+              <div class="sr-label" data-i18n="settingsMotionRow">Hiệu ứng chuyển động</div>
+              <div class="sr-sub" data-i18n="settingsMotionSub">Tắt bớt animation nếu máy yếu hoặc bạn thấy rối mắt</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="settingsMotionSwitch" checked><span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card" style="animation-delay:.11s;">
+          <div class="settings-section-title" data-i18n="settingsExperience">TRẢI NGHIỆM</div>
+          <div class="setting-row">
+            <div class="sr-label" data-i18n="settingsLangRow">Ngôn ngữ</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="sr-value" id="settingsLangLabel" style="cursor:default;">🇻🇳 Tiếng Việt</span>
+              <label class="toggle-switch"><input type="checkbox" id="settingsLangSwitch"><span class="toggle-track"><span class="toggle-knob"></span></span></label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="sr-label" data-i18n="settingsDeviceRow">Thiết bị</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="sr-value" id="settingsDeviceLabel" style="cursor:default;">💻 Máy tính</span>
+              <label class="toggle-switch"><input type="checkbox" id="settingsDeviceSwitch"><span class="toggle-track"><span class="toggle-knob"></span></span></label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="sr-label" data-i18n="settingsSoundRow">Âm thanh</div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="settingsSoundSwitch" checked><span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card" style="animation-delay:.14s;">
+          <div class="settings-section-title" data-i18n="settingsAIData">THỐNG KÊ & DỮ LIỆU</div>
+          <p class="note" data-i18n="settingsAINote">Hệ số công thức và mẫu dây mồi chỉ thay đổi khi bạn chủ động bấm "Áp dụng" ở màn hình Thống kê — không có gì tự động thay đổi ngầm.</p>
+          <div class="settings-data-summary">
+            <span><b id="settingsSampleTotal">0</b> <span data-i18n="settingsSamplesWord">mẫu</span></span>
+            <span><b id="settingsSampleSuccess">0</b> <span data-i18n="statSuccess">Thành công</span></span>
+          </div>
+          <div class="settings-btn-row">
+            <button id="settingsExportBtn" class="mini-btn mb-neutral" data-i18n="exportBtn">📤 Xuất JSON</button>
+            <button id="settingsImportBtn" class="mini-btn mb-neutral" data-i18n="importBtn">📥 Nhập JSON</button>
+          </div>
+        </div>
+
+        <div class="card" style="animation-delay:.17s;">
+          <div class="settings-section-title" data-i18n="settingsAppData">DỮ LIỆU ỨNG DỤNG</div>
+          <div class="setting-row">
+            <div class="sr-label" data-i18n="settingsHistoryRow">Lịch sử phân tích</div>
+            <span class="sr-value" id="settingsHistoryCount" style="cursor:default;">0</span>
+          </div>
+          <div class="settings-btn-row">
+            <button id="settingsClearHistoryBtn" class="mini-btn" data-i18n="clearHistoryBtn">🗑 Xóa lịch sử</button>
+          </div>
+          <div class="settings-danger-note" data-i18n="settingsDangerNote">⚠️ Thao tác xoá lịch sử không thể hoàn tác.</div>
+        </div>
+
+        <div class="card" style="animation-delay:.2s;">
+          <div class="about-box">
+            <div class="ab-mark">◈</div>
+            <div class="ab-name" data-i18n="logoText">Dây Mồi</div>
+            <div class="ab-tag" data-i18n="aboutTagline">ƯỚC TÍNH THỐNG KÊ</div>
+            <div class="ab-ver">v2.0</div>
+            <div class="about-links">
+              <a href="https://discord.com/channels/1535092618801979474/1535092621892919417" target="_blank" rel="noopener noreferrer" data-i18n="communityMini">💬 Cộng đồng Discord</a>
+              <span id="aboutGuideLink" data-i18n="aboutGuide">📖 Hướng dẫn</span>
+              <span id="aboutDisclaimerLink" data-i18n="aboutDisclaimer">⚠️ Về mô hình</span>
+            </div>
+            <div id="aboutGuideBox" class="note" style="margin-top:14px;text-align:left;display:none;"></div>
+            <div id="aboutDisclaimerBox" class="note" style="margin-top:14px;text-align:left;display:none;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="animation-delay:.23s;" id="baseTableCard">
           <h2 data-i18n="baseTableHeader">📋 Bảng tỷ lệ gốc</h2>
           <table>
             <thead><tr><th>Cấp</th><th>OVR +</th><th>Tổng OVR</th><th>Tỷ lệ gốc</th></tr></thead>
@@ -708,11 +898,11 @@
   </div>
 
   <nav class="bottom-nav" id="bottomNav">
-    <button class="bn-item" data-screen="dashboard"><span class="bn-icon">🏠</span><span data-i18n="navDashboard">Tổng quan</span></button>
-    <button class="bn-item" data-screen="analyzer"><span class="bn-icon">🎯</span><span data-i18n="navAnalyzer">Phân tích</span></button>
-    <button class="bn-item" data-screen="ai"><span class="bn-icon">📐</span><span data-i18n="navAI">Thống kê AI</span></button>
-    <button class="bn-item" data-screen="history"><span class="bn-icon">📜</span><span data-i18n="navHistory">Lịch sử</span></button>
-    <button class="bn-item" data-screen="settings"><span class="bn-icon">⚙️</span><span data-i18n="navSettings">Cài đặt</span></button>
+    <button class="bn-item" data-screen="dashboard"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V10"/></svg></span><span data-i18n="navDashboard">Tổng quan</span></button>
+    <button class="bn-item" data-screen="analyzer"><span class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></span><span data-i18n="navAnalyzer">Phân tích</span></button>
+    <button class="bn-item" data-screen="ai"><span class="bn-icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="13" width="3.5" height="7" rx="1"/><rect x="10.2" y="7" width="3.5" height="13" rx="1"/><rect x="17" y="10" width="3.5" height="10" rx="1"/></svg></span><span data-i18n="navAI">Thống kê AI</span></button>
+    <button class="bn-item" data-screen="history"><span class="bn-icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/></svg></span><span data-i18n="navHistory">Lịch sử</span></button>
+    <button class="bn-item" data-screen="settings"><span class="bn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M3 12h2.5M18.5 12H21M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></span><span data-i18n="navSettings">Cài đặt</span></button>
   </nav>
 
 </div>
@@ -802,8 +992,10 @@ let filterResult = 'all';
 const STRINGS = {
   vi: {
     deviceTitle: '🎲 Dây Mồi Calculator',
+    logoText: 'Dây Mồi',
+    deviceSubtitleSmall: 'Ước tính thống kê',
     communityTitle: 'Tham gia cộng đồng Discord',
-    navDashboard: 'Tổng quan', navAnalyzer: 'Phân tích', navAI: 'Thống kê AI', navHistory: 'Lịch sử', navSettings: 'Cài đặt',
+    navDashboard: 'Tổng quan', navAnalyzer: 'Phân tích', navAI: 'Thống kê', navHistory: 'Lịch sử', navSettings: 'Cài đặt',
     communityMini: 'Cộng đồng Discord',
     heroLabel: '🎯 TỈ LỆ ƯỚC TÍNH GẦN NHẤT',
     heroCta: '✨ Đi tới Phân tích dây mồi',
@@ -813,7 +1005,33 @@ const STRINGS = {
     heroSampleBadge: '📊 {n} mẫu',
     statTotal: 'Lần lưu', statSuccess: 'Thành công', statFail: 'Thất bại', statAccuracy: 'Tỷ lệ thực tế TB',
     settingsHeader: '⚙️ Cài đặt',
-    settingsHint: 'Đổi ngôn ngữ / thiết bị / âm thanh / giao diện sáng-tối ở góc trên bên phải.',
+    settingsHint: 'Quản lý giao diện, trải nghiệm và dữ liệu.',
+    settingsAppearance: 'GIAO DIỆN',
+    settingsThemeRow: 'Chế độ giao diện',
+    themeDark: '🌙 Dark', themeLight: '☀️ Light',
+    settingsMotionRow: 'Hiệu ứng chuyển động',
+    settingsMotionSub: 'Tắt bớt animation nếu máy yếu hoặc bạn thấy rối mắt',
+    settingsExperience: 'TRẢI NGHIỆM',
+    settingsLangRow: 'Ngôn ngữ',
+    settingsDeviceRow: 'Thiết bị',
+    settingsSoundRow: 'Âm thanh',
+    settingsAIData: 'THỐNG KÊ & DỮ LIỆU',
+    settingsAINote: 'Hệ số công thức và mẫu dây mồi chỉ thay đổi khi bạn chủ động bấm "Áp dụng" ở màn hình Thống kê — không có gì tự động thay đổi ngầm.',
+    settingsSamplesWord: 'mẫu',
+    settingsAppData: 'DỮ LIỆU ỨNG DỤNG',
+    settingsHistoryRow: 'Lịch sử phân tích',
+    settingsDangerNote: '⚠️ Thao tác xoá lịch sử không thể hoàn tác.',
+    aboutTagline: 'ƯỚC TÍNH THỐNG KÊ',
+    aboutGuide: '📖 Hướng dẫn',
+    aboutDisclaimer: '⚠️ Về mô hình',
+    guideText: '1️⃣ Chọn cấp muốn lên ở Phân tích. 2️⃣ Nhập dây mồi (gõ tay, bấm pill số, hoặc bàn phím mobile). 3️⃣ Xem % ước tính + độ tin cậy. 4️⃣ Sau khi đập thật, quay lại Lịch sử đánh dấu ✅/❌ để công thức càng dùng càng chính xác.',
+    heroSubLabel: 'Tỷ lệ ước tính',
+    heroSamplesWord: 'mẫu',
+    settingsAccount: 'TÀI KHOẢN',
+    accountIntro: 'Đăng nhập bằng Google để hiển thị tên/email của bạn trong app. Lưu ý: dữ liệu vẫn chỉ lưu trên máy này, đăng nhập không đồng bộ giữa các thiết bị.',
+    signOutBtn: 'Đăng xuất',
+    gsiNotConfigured: 'Chưa cấu hình đăng nhập Google cho bản này (thiếu Client ID). Người phát triển cần tạo OAuth Client ID miễn phí tại Google Cloud Console rồi dán vào code (biến GOOGLE_CLIENT_ID).',
+    gsiLoadFailed: 'Không tải được dịch vụ đăng nhập Google — kiểm tra kết nối mạng, hoặc bạn đang mở file trực tiếp (file://) thay vì qua http/https (Google Sign-In yêu cầu domain thật).',
     communitySub: 'Trao đổi dây mồi, kết quả thực tế với người chơi khác',
     deviceSubtitle: 'Bạn đang dùng thiết bị nào?',
     devicePC: '💻 Máy tính (PC)', devicePCsub: 'Gõ dây mồi bằng bàn phím thường',
@@ -910,8 +1128,10 @@ const STRINGS = {
   },
   en: {
     deviceTitle: '🎲 Bait Chain Calculator',
+    logoText: 'Bait Chain',
+    deviceSubtitleSmall: 'Statistical estimate',
     communityTitle: 'Join our Discord community',
-    navDashboard: 'Dashboard', navAnalyzer: 'Analyzer', navAI: 'AI Stats', navHistory: 'History', navSettings: 'Settings',
+    navDashboard: 'Dashboard', navAnalyzer: 'Analyzer', navAI: 'Insights', navHistory: 'History', navSettings: 'Settings',
     communityMini: 'Discord community',
     heroLabel: '🎯 LATEST ESTIMATED RATE',
     heroCta: '✨ Go to Bait Analyzer',
@@ -921,7 +1141,33 @@ const STRINGS = {
     heroSampleBadge: '📊 {n} samples',
     statTotal: 'Saved', statSuccess: 'Success', statFail: 'Fail', statAccuracy: 'Avg actual rate',
     settingsHeader: '⚙️ Settings',
-    settingsHint: 'Change language / device / sound / theme from the top-right icons.',
+    settingsHint: 'Manage appearance, experience and data.',
+    settingsAppearance: 'APPEARANCE',
+    settingsThemeRow: 'Theme mode',
+    themeDark: '🌙 Dark', themeLight: '☀️ Light',
+    settingsMotionRow: 'Motion effects',
+    settingsMotionSub: 'Turn off extra animation if it feels distracting or your device is slow',
+    settingsExperience: 'EXPERIENCE',
+    settingsLangRow: 'Language',
+    settingsDeviceRow: 'Device',
+    settingsSoundRow: 'Sound',
+    settingsAIData: 'STATS & DATA',
+    settingsAINote: 'Formula coefficients and bait patterns only change when you actively press "Apply" on the Stats screen — nothing changes automatically in the background.',
+    settingsSamplesWord: 'samples',
+    settingsAppData: 'APP DATA',
+    settingsHistoryRow: 'Analysis history',
+    settingsDangerNote: '⚠️ Clearing history cannot be undone.',
+    aboutTagline: 'STATISTICAL ESTIMATE',
+    aboutGuide: '📖 Guide',
+    aboutDisclaimer: '⚠️ About the model',
+    guideText: '1️⃣ Pick a target level on Analyzer. 2️⃣ Enter a bait chain (type, tap a pill, or use the mobile keypad). 3️⃣ Check the estimated % and confidence. 4️⃣ After the real upgrade, go to History and mark ✅/❌ so the formula gets more accurate over time.',
+    heroSubLabel: 'Estimated rate',
+    heroSamplesWord: 'samples',
+    settingsAccount: 'ACCOUNT',
+    accountIntro: 'Sign in with Google to show your name/email in the app. Note: data still stays on this device only — signing in does not sync anything across devices.',
+    signOutBtn: 'Sign out',
+    gsiNotConfigured: 'Google Sign-In is not configured for this build (missing Client ID). The developer needs to create a free OAuth Client ID at Google Cloud Console and paste it into the code (GOOGLE_CLIENT_ID variable).',
+    gsiLoadFailed: 'Could not load Google Sign-In — check your connection, or you may be opening this file directly (file://) instead of via http/https (Google Sign-In requires a real domain).',
     communitySub: 'Share bait chains and real results with other players',
     deviceSubtitle: 'Which device are you using?',
     devicePC: '💻 Computer (PC)', devicePCsub: 'Type using a regular keyboard',
@@ -1033,32 +1279,58 @@ function applyLanguage(lang) {
   if (legendNote) legendNote.innerHTML =
     `<span style="color:#6be08a;">■ ${t('legendUp')}</span> · <span style="color:#e0a83f;">■ ${t('legendNeu')}</span> · <span style="color:#e05b5b;">■ ${t('legendDown')}</span> · <span style="color:#ffd166;">■ ${t('legendReset')}</span>`;
   document.getElementById('langToggle').textContent = lang === 'vi' ? 'VI' : 'EN';
+  const langSw = document.getElementById('settingsLangSwitch');
+  if (langSw) langSw.checked = (lang === 'en');
+  const langLabel = document.getElementById('settingsLangLabel');
+  if (langLabel) langLabel.textContent = lang === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English';
   renderTargetPills(); renderChips(); renderHistory(); refreshAnalytics(); renderCoeffCurrent(); calculate();
 }
 
 
 try { theme = localStorage.getItem('dayMoiTheme') || 'dark'; } catch (e) {}
-function applyTheme(t) {
-  document.body.classList.toggle('theme-light', t === 'light');
-  document.getElementById('themeToggle').textContent = t === 'light' ? '🌙' : '☀️';
+function applyTheme(mode) {
+  document.body.classList.toggle('theme-light', mode === 'light');
+  document.getElementById('themeToggle').textContent = mode === 'light' ? '🌙' : '☀️';
+  const sw = document.getElementById('settingsThemeSwitch');
+  if (sw) sw.checked = (mode === 'light');
+  const label = document.getElementById('settingsThemeLabel');
+  if (label) label.textContent = mode === 'light' ? t('themeLight') : t('themeDark');
 }
-applyTheme(theme);
-document.getElementById('themeToggle').addEventListener('click', () => {
+function toggleTheme() {
   theme = theme === 'light' ? 'dark' : 'light';
   try { localStorage.setItem('dayMoiTheme', theme); } catch (e) {}
   applyTheme(theme);
-});
+}
+applyTheme(theme);
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+/* ===== Hiệu ứng chuyển động ===== */
+let motionOn = true;
+try { motionOn = (localStorage.getItem('dayMoiMotion') ?? 'on') === 'on'; } catch (e) {}
+function applyMotion(on) {
+  motionOn = on;
+  document.body.classList.toggle('no-motion', !on);
+  try { localStorage.setItem('dayMoiMotion', on ? 'on' : 'off'); } catch (e) {}
+  const sw = document.getElementById('settingsMotionSwitch');
+  if (sw) sw.checked = on;
+}
+applyMotion(motionOn);
 
 /* ===== Âm thanh ===== */
 let soundOn = true;
 try { soundOn = (localStorage.getItem('dayMoiSound') ?? 'on') === 'on'; } catch (e) {}
-function updateSoundBtn() { document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇'; }
-updateSoundBtn();
-document.getElementById('soundToggle').addEventListener('click', () => {
+function updateSoundBtn() {
+  document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇';
+  const sw = document.getElementById('settingsSoundSwitch');
+  if (sw) sw.checked = soundOn;
+}
+function toggleSound() {
   soundOn = !soundOn;
   try { localStorage.setItem('dayMoiSound', soundOn ? 'on' : 'off'); } catch (e) {}
   updateSoundBtn();
-});
+}
+updateSoundBtn();
+document.getElementById('soundToggle').addEventListener('click', toggleSound);
 let audioCtx = null;
 function playTone(freq, duration, type, vol) {
   if (!soundOn) return;
@@ -1206,7 +1478,7 @@ function renderHero() {
   const barEl = document.getElementById('heroBarFill');
   const confFillEl = document.getElementById('heroConfFill');
   const confPctEl = document.getElementById('heroConfPct');
-  const badgesEl = document.getElementById('heroBadges');
+  const sampleEl = document.getElementById('heroSampleText');
 
   let source = currentResult;
   if (!source && history.length) {
@@ -1216,18 +1488,20 @@ function renderHero() {
   if (!source) {
     pctEl.textContent = '--%';
     diffEl.textContent = t('heroNoData');
+    diffEl.style.background = 'rgba(255,255,255,.08)';
     diffEl.style.color = 'var(--text-muted)';
     barEl.style.width = '0%';
     confFillEl.style.width = '0%';
     confPctEl.textContent = '--';
-    badgesEl.innerHTML = '';
+    sampleEl.innerHTML = `-- <span>${t('heroSamplesWord')}</span>`;
     return;
   }
   const stepRow = levels.find(r => r.to === source.target);
   const baseRate = stepRow ? stepRow.rate : 0;
   const diff = source.rate - baseRate;
   pctEl.textContent = source.rate.toFixed(1) + '%';
-  diffEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1) + '% ' + t('heroVsBase');
+  diffEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1) + '%';
+  diffEl.style.background = diff >= 0 ? 'rgba(47,143,90,.2)' : 'rgba(168,54,54,.2)';
   diffEl.style.color = diff >= 0 ? '#8ef0b0' : '#ff9d9d';
   barEl.style.width = Math.max(2, Math.min(100, source.rate)) + '%';
 
@@ -1236,14 +1510,7 @@ function renderHero() {
   const tier = reliabilityTier(n);
   confFillEl.style.width = tier.pct + '%';
   confPctEl.textContent = t(BUCKET_LABEL_KEY[source.rate >= 60 ? 'high' : source.rate >= 30 ? 'mid' : 'low']).replace(/^[^\s]+\s/, '');
-
-  const badges = [];
-  if (source.rate >= 60) badges.push(['badge-green', t('rateBadgeHigh')]);
-  else if (source.rate >= 30) badges.push(['badge-yellow', t('rateBadgeMid')]);
-  else badges.push(['badge-red', t('rateBadgeLow')]);
-  badges.push(['badge-' + (tier.key === 'vhigh' || tier.key === 'high' ? 'green' : tier.key === 'mid' ? 'yellow' : 'red'), t('confTier_' + tier.key)]);
-  badges.push(['badge-yellow', t('heroSampleBadge', { n })]);
-  badgesEl.innerHTML = badges.map(([cls, label]) => `<span class="badge ${cls}">${label}</span>`).join('');
+  sampleEl.innerHTML = `${n} <span>${t('heroSamplesWord')}</span>`;
 }
 
 /* ===== Stat cards (Dashboard) ===== */
@@ -1256,6 +1523,13 @@ function renderStatCards() {
   document.getElementById('statSuccess').textContent = success;
   document.getElementById('statFail').textContent = fail;
   document.getElementById('statAccuracy').textContent = stats ? stats.avgActual.toFixed(0) + '%' : '--';
+
+  const st = document.getElementById('settingsSampleTotal');
+  if (st) st.textContent = total;
+  const ss = document.getElementById('settingsSampleSuccess');
+  if (ss) ss.textContent = success;
+  const shc = document.getElementById('settingsHistoryCount');
+  if (shc) shc.textContent = total;
 }
 
 /* ===== Quick-add pill (1-9) cạnh ô nhập dây mồi ===== */
@@ -1331,10 +1605,12 @@ document.getElementById('historyList').addEventListener('click', (e) => {
   else if (action === 'delete') deleteEntry(id);
 });
 
-document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+function requestClearHistory() {
   if (!history.length) return;
   document.getElementById('confirmOverlay').classList.add('show');
-});
+}
+document.getElementById('clearHistoryBtn').addEventListener('click', requestClearHistory);
+document.getElementById('settingsClearHistoryBtn').addEventListener('click', requestClearHistory);
 document.getElementById('confirmCancelBtn').addEventListener('click', () => {
   document.getElementById('confirmOverlay').classList.remove('show');
 });
@@ -1346,7 +1622,8 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
 saveBtn.addEventListener('click', () => {
   if (!currentResult) return;
   const id = Date.now() + '-' + Math.random().toString(36).slice(2, 7);
-  history.push({ id, target: currentResult.target, rate: currentResult.rate, chain: currentResult.chain, note: noteInput.value.trim(), ts: Date.now(), result: null });
+  const profile = getCurrentProfile();
+  history.push({ id, target: currentResult.target, rate: currentResult.rate, chain: currentResult.chain, note: noteInput.value.trim(), ts: Date.now(), result: null, owner: profile ? profile.email : null });
   if (history.length > 80) history = history.slice(-80);
   noteInput.value = '';
   persistHistory(); renderHistory(); refreshAnalytics();
@@ -1357,16 +1634,15 @@ document.getElementById('filterLevel').addEventListener('change', (e) => { filte
 document.getElementById('filterResult').addEventListener('change', (e) => { filterResult = e.target.value; renderHistory(); });
 
 /* ===== Xuất / Nhập JSON ===== */
-document.getElementById('exportBtn').addEventListener('click', () => {
+function exportHistoryJson() {
   const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'day-moi-history.json';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
-});
-document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importInput').click());
-document.getElementById('importInput').addEventListener('change', (e) => {
-  const file = e.target.files[0]; if (!file) return;
+}
+function importHistoryJsonFile(file) {
+  if (!file) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
     try {
@@ -1377,9 +1653,16 @@ document.getElementById('importInput').addEventListener('change', (e) => {
         persistHistory(); renderHistory(); refreshAnalytics();
       } else { alert('File JSON không đúng định dạng (cần là một mảng).'); }
     } catch (err) { alert('Không đọc được file JSON này.'); }
-    e.target.value = '';
   };
   reader.readAsText(file);
+}
+document.getElementById('exportBtn').addEventListener('click', exportHistoryJson);
+document.getElementById('settingsExportBtn').addEventListener('click', exportHistoryJson);
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importInput').click());
+document.getElementById('settingsImportBtn').addEventListener('click', () => document.getElementById('importInput').click());
+document.getElementById('importInput').addEventListener('change', (e) => {
+  importHistoryJsonFile(e.target.files[0]);
+  e.target.value = '';
 });
 
 /* ===== Thống kê độ chính xác ===== */
@@ -1708,6 +1991,94 @@ document.getElementById('learnPatternBtn').addEventListener('click', () => {
   });
 });
 
+/* =====================================================================
+   ĐĂNG NHẬP GOOGLE (Google Identity Services)
+   -----------------------------------------------------------------
+   Đây KHÔNG phải hệ thống tài khoản thật có server — chỉ xác thực
+   "đây là ai" (tên/email/ảnh) ngay trên trình duyệt. Dữ liệu (lịch sử,
+   hệ số đã học...) vẫn CHỈ lưu trên máy này (localStorage), KHÔNG
+   đồng bộ giữa các thiết bị dù đăng nhập cùng 1 tài khoản.
+
+   ĐỂ HOẠT ĐỘNG, BẠN CẦN THAY GOOGLE_CLIENT_ID BÊN DƯỚI:
+   1. Vào https://console.cloud.google.com/apis/credentials
+   2. Tạo project mới (hoặc dùng project có sẵn).
+   3. "Create Credentials" → "OAuth client ID" → chọn "Web application".
+   4. Ở mục "Authorized JavaScript origins", thêm đúng domain bạn sẽ
+      host file này (vd: https://ten-mien-cua-ban.com). Nếu chỉ test
+      trên máy, thêm "http://localhost" và chạy qua localhost, vì
+      Google Sign-In KHÔNG hoạt động khi mở trực tiếp file (file://).
+   5. Copy "Client ID" (dạng xxxx.apps.googleusercontent.com) dán vào
+      biến GOOGLE_CLIENT_ID ngay dưới đây.
+===================================================================== */
+const GOOGLE_CLIENT_ID = '149769355650-o63l354climisuf2v5gckbpq4ntf73mv.apps.googleusercontent.com';
+
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+  return JSON.parse(jsonPayload);
+}
+
+function handleGoogleCredential(response) {
+  try {
+    const payload = parseJwt(response.credential);
+    const profile = { name: payload.name, email: payload.email, picture: payload.picture };
+    localStorage.setItem('dayMoiProfile', JSON.stringify(profile));
+  } catch (e) {}
+  renderAccountSection();
+}
+
+function signOutGoogle() {
+  try { localStorage.removeItem('dayMoiProfile'); } catch (e) {}
+  if (window.google && google.accounts && google.accounts.id) {
+    try { google.accounts.id.disableAutoSelect(); } catch (e) {}
+  }
+  renderAccountSection();
+}
+
+function getCurrentProfile() {
+  try { return JSON.parse(localStorage.getItem('dayMoiProfile') || 'null'); } catch (e) { return null; }
+}
+
+function renderAccountSection() {
+  const profile = getCurrentProfile();
+  const outBox = document.getElementById('accountSignedOut');
+  const inBox = document.getElementById('accountSignedIn');
+  if (profile) {
+    outBox.style.display = 'none';
+    inBox.style.display = 'flex';
+    document.getElementById('accountAvatar').src = profile.picture || '';
+    document.getElementById('accountName').textContent = profile.name || '';
+    document.getElementById('accountEmail').textContent = profile.email || '';
+  } else {
+    outBox.style.display = 'block';
+    inBox.style.display = 'none';
+  }
+}
+
+let gsiInitAttempts = 0;
+function initGoogleSignIn() {
+  const configNote = document.getElementById('gsiConfigNote');
+  if (GOOGLE_CLIENT_ID.indexOf('YOUR_GOOGLE_CLIENT_ID') !== -1) {
+    // Chưa cấu hình Client ID thật -> ẩn nút, hiện ghi chú hướng dẫn thay vì gọi API (sẽ lỗi)
+    configNote.style.display = 'block';
+    configNote.textContent = t('gsiNotConfigured');
+    return;
+  }
+  if (!window.google || !google.accounts || !google.accounts.id) {
+    if (gsiInitAttempts++ < 40) { setTimeout(initGoogleSignIn, 250); }
+    else { configNote.style.display = 'block'; configNote.textContent = t('gsiLoadFailed'); }
+    return;
+  }
+  try {
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+    google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), { theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', locale: LANG === 'vi' ? 'vi' : 'en' });
+  } catch (e) {
+    configNote.style.display = 'block';
+    configNote.textContent = t('gsiLoadFailed');
+  }
+}
+
 function init() {
   levels.forEach(row => {
     const tr = document.createElement('tr');
@@ -1741,6 +2112,28 @@ function init() {
     btn.addEventListener('click', () => switchScreen(btn.dataset.screen));
   });
   document.getElementById('heroCta').addEventListener('click', () => switchScreen('analyzer'));
+
+  document.getElementById('settingsThemeSwitch').addEventListener('change', toggleTheme);
+  document.getElementById('settingsMotionSwitch').addEventListener('change', (e) => applyMotion(e.target.checked));
+  document.getElementById('settingsLangSwitch').addEventListener('change', (e) => applyLanguage(e.target.checked ? 'en' : 'vi'));
+  document.getElementById('settingsDeviceSwitch').addEventListener('change', (e) => chooseDevice(e.target.checked ? 'mobile' : 'pc'));
+  document.getElementById('settingsSoundSwitch').addEventListener('change', toggleSound);
+
+  document.getElementById('aboutGuideLink').addEventListener('click', () => {
+    const box = document.getElementById('aboutGuideBox');
+    document.getElementById('aboutDisclaimerBox').style.display = 'none';
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    box.innerHTML = t('guideText');
+  });
+  document.getElementById('aboutDisclaimerLink').addEventListener('click', () => {
+    const box = document.getElementById('aboutDisclaimerBox');
+    document.getElementById('aboutGuideBox').style.display = 'none';
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    box.innerHTML = t('baseTableNote');
+  });
+  document.getElementById('signOutBtn').addEventListener('click', signOutGoogle);
+  renderAccountSection();
+  initGoogleSignIn();
   renderQuickAddPills();
 
   let savedScreen = 'dashboard';
@@ -1776,6 +2169,10 @@ function chooseDevice(mode) {
   const btn = document.getElementById('deviceToggle');
   btn.textContent = mode === 'mobile' ? '💻' : '📱';
   btn.title = mode === 'mobile' ? t('switchToPC') : t('switchToMobile');
+  const devSw = document.getElementById('settingsDeviceSwitch');
+  if (devSw) devSw.checked = (mode === 'mobile');
+  const devLabel = document.getElementById('settingsDeviceLabel');
+  if (devLabel) devLabel.textContent = mode === 'mobile' ? t('deviceMobile') : t('devicePC');
 }
 
 function renderTargetPills() {
