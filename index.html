@@ -53,6 +53,69 @@
   .device-btn:hover { border-color: #7d5fe0; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,90,224,.25); }
   .device-btn .sub { display: block; font-size: 11px; color: #9d94b8; font-weight: 400; margin-top: 4px; }
 
+  /* ===== Intro gate: chuyển cảnh mở app + đăng nhập đầu tiên ===== */
+  #introGate {
+    position: fixed; inset: 0; z-index: 1200; overflow: hidden;
+    background: radial-gradient(circle at 50% 30%, #241a3a 0%, #0d0b17 55%, #08070f 100%);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .ig-splash { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+  .ig-splash-mark {
+    width: 76px; height: 76px; border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg,#7d5fe0,#4fd1c5); color: #fff; font-weight: 900; font-size: 34px;
+    box-shadow: 0 0 60px rgba(124,90,224,.55); animation: igMarkIn 1s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .ig-splash-text { font-size: 13px; font-weight: 700; letter-spacing: 2px; color: #9d94b8; text-transform: uppercase; opacity: 0; animation: igFadeUp .6s ease .5s both; }
+  @keyframes igMarkIn { from { opacity: 0; transform: scale(.3) rotate(-20deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+  @keyframes igFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  #introGate.stage-login .ig-splash { animation: igSplashOut .5s ease forwards; }
+  @keyframes igSplashOut { to { opacity: 0; transform: scale(.9); pointer-events: none; } }
+
+  .ig-login-box {
+    position: relative; width: 100%; max-width: 380px; opacity: 0; transform: translateY(14px);
+    pointer-events: none; text-align: left;
+    background: rgba(30,25,54,.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 20px; padding: 28px 26px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  #introGate.stage-login .ig-login-box { animation: igFadeUp .6s ease .35s both; pointer-events: auto; }
+  .ig-login-head { text-align: center; margin-bottom: 20px; }
+  .ig-login-mark {
+    width: 48px; height: 48px; border-radius: 13px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg,#7d5fe0,#4fd1c5); color: #fff; font-weight: 900; font-size: 20px; box-shadow: 0 8px 24px rgba(124,90,224,.4);
+  }
+  .ig-login-title { font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 3px; }
+  .ig-login-sub { font-size: 12px; color: #9d94b8; }
+
+  .ig-field { margin-bottom: 16px; }
+  .ig-field label { display: block; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #b9b0d6; text-transform: uppercase; margin-bottom: 8px; }
+  .ig-field input {
+    width: 100%; padding: 13px 14px; border-radius: 10px; border: 1px solid transparent;
+    background: #eef0fb; color: #171226; font-size: 14px; font-weight: 600;
+  }
+  .ig-field input::placeholder { color: #8b84a3; font-weight: 400; }
+  .ig-field input:focus { outline: none; border-color: #7d5fe0; }
+
+  .ig-row-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; font-size: 11px; color: #9d94b8; }
+  .ig-remember { display: flex; align-items: center; gap: 7px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+  .ig-remember input { width: 15px; height: 15px; accent-color: #7d5fe0; cursor: pointer; }
+
+  .ig-primary-btn {
+    width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 800; font-size: 13px; letter-spacing: .5px;
+    background: linear-gradient(135deg,#7d5fe0,#5a3fc0); color: #fff; cursor: pointer;
+    box-shadow: 0 8px 22px rgba(124,90,224,.4); text-transform: uppercase;
+  }
+  .ig-primary-btn:hover { filter: brightness(1.08); }
+
+  .ig-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0; font-size: 11px; color: #6a628a; }
+  .ig-divider::before, .ig-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.1); }
+
+  #igGoogleBtn { display: flex; justify-content: center; }
+  .ig-signup-row { font-size: 12px; color: #9d94b8; margin-top: 18px; text-align: center; }
+  .ig-signup-row a { color: #a9b3ff; font-weight: 700; text-decoration: none; }
+  .ig-signup-row a:hover { text-decoration: underline; }
+  .ig-skip-btn { display: block; margin: 16px auto 0; font-size: 11px; color: #6a628a; background: none; border: none; cursor: pointer; text-decoration: underline; }
+  .ig-config-note { margin-top: 12px; font-size: 11px; color: #9d94b8; background: rgba(255,255,255,.04); border-radius: 10px; padding: 10px 12px; text-align: left; line-height: 1.6; }
+
   .wrap { display: none; flex-direction: column; gap: 16px; max-width: 480px; margin: auto; }
   @media (min-width: 700px) { .wrap { max-width: 650px; } }
   @media (min-width: 1024px) { .wrap { max-width: 800px; } }
@@ -533,7 +596,46 @@
 </head>
 <body>
 
+<div id="introGate">
+  <div class="ig-splash">
+    <div class="ig-splash-mark">◈</div>
+    <div class="ig-splash-text" data-i18n="logoText">Dây Mồi</div>
+  </div>
+
+  <div class="ig-login-box">
+    <div class="ig-login-head">
+      <div class="ig-login-mark">◈</div>
+      <div class="ig-login-title" data-i18n="igTitle">Chào mừng trở lại</div>
+      <div class="ig-login-sub" data-i18n="igSubtitle">Vui lòng nhập tên để tiếp tục</div>
+    </div>
+
+    <div class="ig-field">
+      <label data-i18n="igNameLabel">Tên hiển thị</label>
+      <input type="text" id="igGuestName" data-i18n-placeholder="igGuestPlaceholder" placeholder="Nhập tên hiển thị của bạn">
+    </div>
+
+    <div class="ig-row-between">
+      <label class="ig-remember"><input type="checkbox" id="igRememberMe" checked><span data-i18n="igRemember">Ghi nhớ</span></label>
+    </div>
+
+    <button class="ig-primary-btn" id="igGuestSubmit" data-i18n="igContinueBtn">Tiếp tục</button>
+
+    <div class="ig-divider" data-i18n="igOr">hoặc</div>
+
+    <div id="igGoogleBtn"></div>
+    <div id="igConfigNote" class="ig-config-note" style="display:none;"></div>
+
+    <div class="ig-signup-row">
+      <span data-i18n="igNoAccount">Chưa có tài khoản Google?</span>
+      <a href="https://accounts.google.com/signup" target="_blank" rel="noopener noreferrer" data-i18n="igCreateAccount">Đăng ký ngay</a>
+    </div>
+
+    <button class="ig-skip-btn" id="igSkipBtn" data-i18n="igSkip">Bỏ qua, dùng luôn →</button>
+  </div>
+</div>
+
 <div id="deviceChooser">
+
   <h1 data-i18n="deviceTitle">🎲 Dây Mồi Calculator</h1>
   <p data-i18n="deviceSubtitle">Bạn đang dùng thiết bị nào?</p>
   <div class="device-btn" id="btnPC"><span data-i18n="devicePC">💻 Máy tính (PC)</span><span class="sub" data-i18n="devicePCsub">Gõ dây mồi bằng bàn phím thường</span></div>
@@ -923,9 +1025,26 @@ const levels = [
   { from: 12, to: 13, plus: 3, total: 27, rate: 1 }
 ];
 
+/* =====================================================================
+   Tách dữ liệu theo tên/email đăng nhập (không phải xác thực thật —
+   chỉ là namespace key trong localStorage để nhiều người dùng chung
+   1 trình duyệt/máy không bị lẫn lịch sử của nhau).
+===================================================================== */
+function computeUserKey() {
+  let profile = null;
+  try { profile = JSON.parse(localStorage.getItem('dayMoiProfile') || 'null'); } catch (e) {}
+  if (!profile) { try { profile = JSON.parse(sessionStorage.getItem('dayMoiProfileSession') || 'null'); } catch (e) {} }
+  if (!profile) return 'default';
+  const raw = (profile.email || profile.name || '').trim().toLowerCase();
+  if (!raw) return 'default';
+  return raw.replace(/[^a-z0-9._@-]/g, '_').slice(0, 60);
+}
+let currentUserKey = computeUserKey();
+function skey(base) { return currentUserKey === 'default' ? base : base + ':' + currentUserKey; }
+
 let STEP_UP = 6, STREAK_STEP = 1, PENALTY_5 = 8, CAP_BONUS = 45, TAIL_SCALE = 1;
 try {
-  const savedCoeffs = JSON.parse(localStorage.getItem('dayMoiCoeffs') || 'null');
+  const savedCoeffs = JSON.parse(localStorage.getItem(skey('dayMoiCoeffs')) || 'null');
   if (savedCoeffs) {
     STEP_UP = savedCoeffs.STEP_UP ?? STEP_UP;
     STREAK_STEP = savedCoeffs.STREAK_STEP ?? STREAK_STEP;
@@ -935,17 +1054,31 @@ try {
   }
 } catch (e) {}
 function persistCoeffs() {
-  try { localStorage.setItem('dayMoiCoeffs', JSON.stringify({ STEP_UP, STREAK_STEP, PENALTY_5, CAP_BONUS, TAIL_SCALE })); } catch (e) {}
+  try { localStorage.setItem(skey('dayMoiCoeffs'), JSON.stringify({ STEP_UP, STREAK_STEP, PENALTY_5, CAP_BONUS, TAIL_SCALE })); } catch (e) {}
+}
+function loadCoeffsForCurrentUser() {
+  STEP_UP = 6; STREAK_STEP = 1; PENALTY_5 = 8; CAP_BONUS = 45; TAIL_SCALE = 1;
+  try {
+    const saved = JSON.parse(localStorage.getItem(skey('dayMoiCoeffs')) || 'null');
+    if (saved) {
+      STEP_UP = saved.STEP_UP ?? STEP_UP;
+      STREAK_STEP = saved.STREAK_STEP ?? STREAK_STEP;
+      PENALTY_5 = saved.PENALTY_5 ?? PENALTY_5;
+      CAP_BONUS = saved.CAP_BONUS ?? CAP_BONUS;
+      TAIL_SCALE = saved.TAIL_SCALE ?? TAIL_SCALE;
+    }
+  } catch (e) {}
 }
 
 const rawGoodChains56 = ["3331","223","121","31","322","3233","44","2422","144","232","222","223","31","3332","234","122","244","422","1322","331","2424"];
 const rawGoodChains67 = ["2232","223344","422","33122","332","3232","232","23","141","21","2332","4134","33","313","2242","32242","333","34234","3138","2432"];
 function buildPatternSet(raw) { return [...new Set(raw)].map(text => ({ text, bonus: Math.min(6 + text.length * 3, 20) })); }
-const goodPatterns = { "5-6": buildPatternSet(rawGoodChains56), "6-7": buildPatternSet(rawGoodChains67) };
+let goodPatterns = { "5-6": buildPatternSet(rawGoodChains56), "6-7": buildPatternSet(rawGoodChains67) };
 
-function mergeLearnedPatterns() {
+function rebuildGoodPatterns() {
+  goodPatterns = { "5-6": buildPatternSet(rawGoodChains56), "6-7": buildPatternSet(rawGoodChains67) };
   let learned = {};
-  try { learned = JSON.parse(localStorage.getItem('dayMoiLearnedPatterns') || '{}'); } catch (e) {}
+  try { learned = JSON.parse(localStorage.getItem(skey('dayMoiLearnedPatterns')) || '{}'); } catch (e) {}
   Object.keys(learned).forEach(key => {
     if (!goodPatterns[key]) goodPatterns[key] = [];
     (learned[key] || []).forEach(item => {
@@ -958,14 +1091,14 @@ function mergeLearnedPatterns() {
     });
   });
 }
-mergeLearnedPatterns();
+rebuildGoodPatterns();
 function persistLearnedPatterns() {
   const learned = {};
   Object.keys(goodPatterns).forEach(key => {
     const items = goodPatterns[key].filter(p => p.learned).map(p => ({ text: p.text, bonus: p.bonus }));
     if (items.length) learned[key] = items;
   });
-  try { localStorage.setItem('dayMoiLearnedPatterns', JSON.stringify(learned)); } catch (e) {}
+  try { localStorage.setItem(skey('dayMoiLearnedPatterns'), JSON.stringify(learned)); } catch (e) {}
 }
 
 const targetPillsEl = document.getElementById('targetPills');
@@ -1028,10 +1161,21 @@ const STRINGS = {
     heroSubLabel: 'Tỷ lệ ước tính',
     heroSamplesWord: 'mẫu',
     settingsAccount: 'TÀI KHOẢN',
-    accountIntro: 'Đăng nhập bằng Google để hiển thị tên/email của bạn trong app. Lưu ý: dữ liệu vẫn chỉ lưu trên máy này, đăng nhập không đồng bộ giữa các thiết bị.',
+    accountIntro: 'Mỗi tên/tài khoản sẽ có lịch sử và hệ số riêng, tách biệt nhau ngay trên trình duyệt này. Lưu ý: dữ liệu chỉ lưu trên máy này, không đồng bộ giữa các thiết bị.',
     signOutBtn: 'Đăng xuất',
     gsiNotConfigured: 'Chưa cấu hình đăng nhập Google cho bản này (thiếu Client ID). Người phát triển cần tạo OAuth Client ID miễn phí tại Google Cloud Console rồi dán vào code (biến GOOGLE_CLIENT_ID).',
     gsiLoadFailed: 'Không tải được dịch vụ đăng nhập Google — kiểm tra kết nối mạng, hoặc bạn đang mở file trực tiếp (file://) thay vì qua http/https (Google Sign-In yêu cầu domain thật).',
+    igTitle: 'Chào mừng trở lại',
+    igSubtitle: 'Vui lòng nhập tên để tiếp tục',
+    igNameLabel: 'Tên hiển thị',
+    igRemember: 'Ghi nhớ',
+    igContinueBtn: 'Tiếp tục',
+    igOr: 'hoặc',
+    igGuestPlaceholder: 'Nhập tên hiển thị của bạn',
+    igNoAccount: 'Chưa có tài khoản Google?',
+    igCreateAccount: 'Đăng ký ngay',
+    igSkip: 'Bỏ qua, dùng luôn →',
+    igGuestTag: 'Tài khoản khách (chỉ lưu trên máy này)',
     communitySub: 'Trao đổi dây mồi, kết quả thực tế với người chơi khác',
     deviceSubtitle: 'Bạn đang dùng thiết bị nào?',
     devicePC: '💻 Máy tính (PC)', devicePCsub: 'Gõ dây mồi bằng bàn phím thường',
@@ -1164,10 +1308,21 @@ const STRINGS = {
     heroSubLabel: 'Estimated rate',
     heroSamplesWord: 'samples',
     settingsAccount: 'ACCOUNT',
-    accountIntro: 'Sign in with Google to show your name/email in the app. Note: data still stays on this device only — signing in does not sync anything across devices.',
+    accountIntro: 'Each name/account gets its own separate history and coefficients on this browser. Note: data stays on this device only — it does not sync across devices.',
     signOutBtn: 'Sign out',
     gsiNotConfigured: 'Google Sign-In is not configured for this build (missing Client ID). The developer needs to create a free OAuth Client ID at Google Cloud Console and paste it into the code (GOOGLE_CLIENT_ID variable).',
     gsiLoadFailed: 'Could not load Google Sign-In — check your connection, or you may be opening this file directly (file://) instead of via http/https (Google Sign-In requires a real domain).',
+    igTitle: 'Welcome back',
+    igSubtitle: 'Please enter your name to continue',
+    igNameLabel: 'Display name',
+    igRemember: 'Remember me',
+    igContinueBtn: 'Continue',
+    igOr: 'or',
+    igGuestPlaceholder: 'Enter your display name',
+    igNoAccount: "Don't have a Google account?",
+    igCreateAccount: 'Sign up',
+    igSkip: 'Skip, just use the app →',
+    igGuestTag: 'Guest account (stored on this device only)',
     communitySub: 'Share bait chains and real results with other players',
     deviceSubtitle: 'Which device are you using?',
     devicePC: '💻 Computer (PC)', devicePCsub: 'Type using a regular keyboard',
@@ -1385,9 +1540,11 @@ function setGauge(pct) {
 }
 
 /* ===== Lịch sử ===== */
-let history = [];
-try { history = JSON.parse(localStorage.getItem('dayMoiHistory') || '[]'); } catch (e) { history = []; }
-function persistHistory() { try { localStorage.setItem('dayMoiHistory', JSON.stringify(history)); } catch (e) {} }
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(skey('dayMoiHistory')) || '[]'); } catch (e) { return []; }
+}
+let history = loadHistory();
+function persistHistory() { try { localStorage.setItem(skey('dayMoiHistory'), JSON.stringify(history)); } catch (e) {} }
 
 function verdictLabel(rate) {
   if (rate >= 60) return { emoji: '🔥', text: t('verdictNeedMore'), cls: 'hist-high' };
@@ -2022,22 +2179,46 @@ function parseJwt(token) {
 function handleGoogleCredential(response) {
   try {
     const payload = parseJwt(response.credential);
-    const profile = { name: payload.name, email: payload.email, picture: payload.picture };
+    const profile = { name: payload.name, email: payload.email, picture: payload.picture, guest: false };
     localStorage.setItem('dayMoiProfile', JSON.stringify(profile));
   } catch (e) {}
   renderAccountSection();
+  switchUserData();
+  dismissIntroGate();
 }
 
 function signOutGoogle() {
   try { localStorage.removeItem('dayMoiProfile'); } catch (e) {}
+  try { sessionStorage.removeItem('dayMoiProfileSession'); } catch (e) {}
   if (window.google && google.accounts && google.accounts.id) {
     try { google.accounts.id.disableAutoSelect(); } catch (e) {}
   }
   renderAccountSection();
+  switchUserData();
+}
+
+/* Tải lại toàn bộ dữ liệu (lịch sử, hệ số đã học, mẫu dây mồi) theo đúng
+   người đang đăng nhập, và render lại giao diện cho khớp — gọi mỗi khi
+   đăng nhập / đăng xuất / đổi tên khách. */
+function switchUserData() {
+  currentUserKey = computeUserKey();
+  loadCoeffsForCurrentUser();
+  rebuildGoodPatterns();
+  history = loadHistory();
+  renderHistory();
+  refreshAnalytics();
+  renderCoeffCurrent();
+  calculate();
 }
 
 function getCurrentProfile() {
-  try { return JSON.parse(localStorage.getItem('dayMoiProfile') || 'null'); } catch (e) { return null; }
+  try {
+    const persisted = JSON.parse(localStorage.getItem('dayMoiProfile') || 'null');
+    if (persisted) return persisted;
+  } catch (e) {}
+  try {
+    return JSON.parse(sessionStorage.getItem('dayMoiProfileSession') || 'null');
+  } catch (e) { return null; }
 }
 
 function renderAccountSection() {
@@ -2047,9 +2228,9 @@ function renderAccountSection() {
   if (profile) {
     outBox.style.display = 'none';
     inBox.style.display = 'flex';
-    document.getElementById('accountAvatar').src = profile.picture || '';
+    document.getElementById('accountAvatar').src = profile.picture || ('https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(profile.name || '?'));
     document.getElementById('accountName').textContent = profile.name || '';
-    document.getElementById('accountEmail').textContent = profile.email || '';
+    document.getElementById('accountEmail').textContent = profile.email || (profile.guest ? t('igGuestTag') : '');
   } else {
     outBox.style.display = 'block';
     inBox.style.display = 'none';
@@ -2058,25 +2239,40 @@ function renderAccountSection() {
 
 let gsiInitAttempts = 0;
 function initGoogleSignIn() {
-  const configNote = document.getElementById('gsiConfigNote');
-  if (GOOGLE_CLIENT_ID.indexOf('YOUR_GOOGLE_CLIENT_ID') !== -1) {
-    // Chưa cấu hình Client ID thật -> ẩn nút, hiện ghi chú hướng dẫn thay vì gọi API (sẽ lỗi)
-    configNote.style.display = 'block';
-    configNote.textContent = t('gsiNotConfigured');
+  const notConfigured = GOOGLE_CLIENT_ID.indexOf('YOUR_GOOGLE_CLIENT_ID') !== -1;
+  const configNotes = [document.getElementById('gsiConfigNote'), document.getElementById('igConfigNote')];
+  if (notConfigured) {
+    configNotes.forEach(n => { n.style.display = 'block'; n.textContent = t('gsiNotConfigured'); });
     return;
   }
   if (!window.google || !google.accounts || !google.accounts.id) {
     if (gsiInitAttempts++ < 40) { setTimeout(initGoogleSignIn, 250); }
-    else { configNote.style.display = 'block'; configNote.textContent = t('gsiLoadFailed'); }
+    else { configNotes.forEach(n => { n.style.display = 'block'; n.textContent = t('gsiLoadFailed'); }); }
     return;
   }
   try {
     google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
-    google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), { theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', locale: LANG === 'vi' ? 'vi' : 'en' });
+    const opts = { theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', locale: LANG === 'vi' ? 'vi' : 'en' };
+    google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), opts);
+    google.accounts.id.renderButton(document.getElementById('igGoogleBtn'), opts);
   } catch (e) {
-    configNote.style.display = 'block';
-    configNote.textContent = t('gsiLoadFailed');
+    configNotes.forEach(n => { n.style.display = 'block'; n.textContent = t('gsiLoadFailed'); });
   }
+}
+
+/* ===== Intro gate: chuyển cảnh mở app + đăng nhập đầu tiên ===== */
+function dismissIntroGate() {
+  const gate = document.getElementById('introGate');
+  if (!gate || gate.style.display === 'none') return;
+  gate.style.transition = 'opacity .35s ease';
+  gate.style.opacity = '0';
+  setTimeout(() => { gate.style.display = 'none'; }, 350);
+}
+function startIntroGate() {
+  const gate = document.getElementById('introGate');
+  const profile = getCurrentProfile();
+  if (profile) { gate.style.display = 'none'; return; }
+  setTimeout(() => { gate.classList.add('stage-login'); initGoogleSignIn(); }, 1200);
 }
 
 function init() {
@@ -2133,6 +2329,28 @@ function init() {
   });
   document.getElementById('signOutBtn').addEventListener('click', signOutGoogle);
   renderAccountSection();
+
+  document.getElementById('igGuestSubmit').addEventListener('click', () => {
+    const name = document.getElementById('igGuestName').value.trim();
+    if (!name) { document.getElementById('igGuestName').focus(); return; }
+    const remember = document.getElementById('igRememberMe').checked;
+    const profile = { name, email: '', picture: '', guest: true };
+    try {
+      if (remember) {
+        localStorage.setItem('dayMoiProfile', JSON.stringify(profile));
+      } else {
+        sessionStorage.setItem('dayMoiProfileSession', JSON.stringify(profile));
+      }
+    } catch (e) {}
+    renderAccountSection();
+    switchUserData();
+    dismissIntroGate();
+  });
+  document.getElementById('igGuestName').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('igGuestSubmit').click();
+  });
+  document.getElementById('igSkipBtn').addEventListener('click', dismissIntroGate);
+  startIntroGate();
   initGoogleSignIn();
   renderQuickAddPills();
 
