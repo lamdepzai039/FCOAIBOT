@@ -486,23 +486,10 @@
   }
   .save-btn:active { transform: scale(.97); }
   .save-btn.btn-save { background: linear-gradient(135deg,#7d5fe0,#5a3fc0); }
-  .save-btn.btn-sim { background: linear-gradient(135deg,#2fbf83,#1f8f61); }
+  .save-btn.btn-up { background: linear-gradient(135deg,#2fbf83,#1f8f61); }
+  .save-btn.btn-down { background: linear-gradient(135deg,#e05b5b,#a83636); }
   .save-btn:hover { filter: brightness(1.1); }
   .save-btn:disabled { opacity: .4; cursor: not-allowed; filter: none; }
-  .sim-hint { font-size: 11px; color: var(--text-faint); margin-top: 8px; }
-
-  .sim-overlay {
-    position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 1500; opacity: 0; pointer-events: none; transition: opacity .25s ease; text-align: center;
-    background: rgba(5,4,10,.6); backdrop-filter: blur(4px);
-  }
-  .sim-overlay.show { opacity: 1; pointer-events: auto; }
-  .sim-emoji { font-size: 64px; animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both; }
-  .sim-text { font-size: 28px; font-weight: 900; margin-top: 8px; }
-  .sim-sub { font-size: 14px; color: #cbb8ff; margin-top: 4px; }
-  .sim-success .sim-text { color: #6be08a; }
-  .sim-fail .sim-text { color: #ff8a8a; animation: shakeX .4s ease; }
-  .sim-close-hint { font-size: 11px; color: #9d94b8; margin-top: 16px; }
 
   .hist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
   .hist-header h2 { margin: 0; }
@@ -642,7 +629,6 @@
   <div class="device-btn" id="btnMobile"><span data-i18n="deviceMobile">📱 Điện thoại (Mobile)</span><span class="sub" data-i18n="deviceMobileSub">Dùng bàn phím số cảm ứng tiện hơn</span></div>
 </div>
 
-<div id="simOverlay" class="sim-overlay"></div>
 
 <div id="confirmOverlay" class="confirm-overlay">
   <div class="confirm-box">
@@ -802,10 +788,12 @@
 
           <input id="noteInput" type="text" class="note-input" placeholder="📝 Ghi chú (vd: tên cầu thủ)... — tuỳ chọn" data-i18n-placeholder="notePlaceholder">
           <div class="action-row">
-            <button id="saveResultBtn" class="save-btn btn-save" disabled data-i18n="saveBtn">💾 Lưu kết quả</button>
-            <button id="simulateBtn" class="save-btn btn-sim" disabled data-i18n="simBtn">🎲 Thử nâng cấp</button>
+            <button id="saveResultBtn" class="save-btn btn-save" disabled data-i18n="saveBtn">💾 Lưu (chưa đập)</button>
           </div>
-          <div class="sim-hint">* Nút "Thử nâng cấp" chỉ là mô phỏng xác suất cho vui theo % ước tính, không phải kết quả thật trong game.</div>
+          <div class="action-row" style="margin-top:8px;">
+            <button id="saveUpBtn" class="save-btn btn-up" disabled data-i18n="saveUpBtn">✅ Lên</button>
+            <button id="saveDownBtn" class="save-btn btn-down" disabled data-i18n="saveDownBtn">❌ Rớt</button>
+          </div>
         </div>
       </section>
 
@@ -1042,7 +1030,9 @@ function computeUserKey() {
 let currentUserKey = computeUserKey();
 function skey(base) { return currentUserKey === 'default' ? base : base + ':' + currentUserKey; }
 
-let STEP_UP = 6, STREAK_STEP = 1, PENALTY_5 = 8, CAP_BONUS = 45, TAIL_SCALE = 1;
+let STEP_UP = 8, STREAK_STEP = 1.2, PENALTY_5 = 8, CAP_BONUS = 45, TAIL_SCALE = 1;
+const FOUR_BASE_GAIN = 2.5;   // mồi 4: từ "giữ nguyên" (0%) sang cộng nhẹ
+const RESET_BASE_GAIN = 3;    // mồi 1: dù reset combo vẫn cộng 1 khoản nền nhỏ
 try {
   const savedCoeffs = JSON.parse(localStorage.getItem(skey('dayMoiCoeffs')) || 'null');
   if (savedCoeffs) {
@@ -1057,7 +1047,7 @@ function persistCoeffs() {
   try { localStorage.setItem(skey('dayMoiCoeffs'), JSON.stringify({ STEP_UP, STREAK_STEP, PENALTY_5, CAP_BONUS, TAIL_SCALE })); } catch (e) {}
 }
 function loadCoeffsForCurrentUser() {
-  STEP_UP = 6; STREAK_STEP = 1; PENALTY_5 = 8; CAP_BONUS = 45; TAIL_SCALE = 1;
+  STEP_UP = 8; STREAK_STEP = 1.2; PENALTY_5 = 8; CAP_BONUS = 45; TAIL_SCALE = 1;
   try {
     const saved = JSON.parse(localStorage.getItem(skey('dayMoiCoeffs')) || 'null');
     if (saved) {
@@ -1110,7 +1100,6 @@ const gaugeWrapEl = document.querySelector('.gauge-wrap');
 const gaugePctEl = document.getElementById('gaugePct');
 const fireBadgeEl = document.getElementById('fireBadge');
 const saveBtn = document.getElementById('saveResultBtn');
-const simulateBtn = document.getElementById('simulateBtn');
 const noteInput = document.getElementById('noteInput');
 
 let targetLevel = 6;
@@ -1193,8 +1182,8 @@ const STRINGS = {
     viewDetail: '🧠 Tại sao lại ra con số này?',
     noAdjust: 'Không có mồi 2/3/5+ nào tác động.',
     notePlaceholder: '📝 Ghi chú (vd: tên cầu thủ)... — tuỳ chọn',
-    saveBtn: '💾 Lưu kết quả', simBtn: '🎲 Thử nâng cấp',
-    simHint: '* Nút "Thử nâng cấp" chỉ là mô phỏng xác suất cho vui theo % ước tính, không phải kết quả thật trong game.',
+    saveBtn: '💾 Lưu (chưa đập)',
+    saveUpBtn: '✅ Lên', saveDownBtn: '❌ Rớt',
     historyHeader: '🕘 Lịch sử',
     exportBtn: '📤 Xuất JSON', importBtn: '📥 Nhập JSON', clearHistoryBtn: '🗑 Xóa lịch sử',
     filterAllLevel: 'Tất cả cấp', filterAllResult: 'Tất cả kết quả',
@@ -1240,8 +1229,6 @@ const STRINGS = {
     confirmDesc: 'Hành động này sẽ xoá hết các lần đã lưu (không thể hoàn tác). Bạn có chắc chắn không?',
     confirmCancel: 'Huỷ', confirmDelete: '🗑 Xoá tất cả',
     toastDeleted: 'Đã xoá 1 mục.', toastUndo: '↩️ Hoàn tác',
-    simSuccess: 'THÀNH CÔNG!', simFail: 'THẤT BẠI',
-    simSuccessSub: 'Trúng tỷ lệ {n}%', simFailSub: 'Không trúng tỷ lệ {n}%', simCloseHint: 'Chạm để đóng',
     confBadgeHigh: '✅ Tin cậy', confBadgeMid: '🟡 Tạm ổn', confBadgeLow: '🔴 Dữ liệu ít',
     rateBadgeHigh: '🔥 Tỉ lệ cao', rateBadgeMid: '⚡ Tỉ lệ vừa', rateBadgeLow: '⚠️ Tỉ lệ thấp',
     verdictHighText: '🔥 Tỉ lệ CAO! Dây mồi đang rất đẹp — có thể cân nhắc vào kèo. ({n}% so với tỷ lệ gốc)',
@@ -1265,7 +1252,7 @@ const STRINGS = {
     digitEffectNote: 'Thanh xanh = mồi này làm tăng tỷ lệ thành công thực tế so với mức nền; thanh đỏ = làm giảm. Dữ liệu càng nhiều, số này càng đáng tin.',
     explainBase: 'Tỷ lệ gốc',
     explainBait: 'Mồi {d} × {n}',
-    explainReset: '🔁 Có mồi "1" làm reset tích lũy trước đó',
+    explainReset: '🔁 Mồi 1 (reset combo, vẫn cộng nền)',
     explainDampen: '📉 Cấp cao → hiệu ứng mồi 2/3 giảm còn {pct}%',
     explainTailMatch: '🧩 Khớp mẫu đuôi "{p}"',
     explainTotal: 'Ước tính',
@@ -1340,8 +1327,8 @@ const STRINGS = {
     viewDetail: '🧠 Why this number?',
     noAdjust: 'No 2/3/5+ bait affected this.',
     notePlaceholder: '📝 Note (e.g. player name)... — optional',
-    saveBtn: '💾 Save result', simBtn: '🎲 Try upgrade',
-    simHint: '* The "Try upgrade" button is just a fun probability simulation based on the estimated %, not a real in-game result.',
+    saveBtn: '💾 Save (not yet)',
+    saveUpBtn: '✅ Success', saveDownBtn: '❌ Fail',
     historyHeader: '🕘 History',
     exportBtn: '📤 Export JSON', importBtn: '📥 Import JSON', clearHistoryBtn: '🗑 Clear history',
     filterAllLevel: 'All levels', filterAllResult: 'All results',
@@ -1387,8 +1374,6 @@ const STRINGS = {
     confirmDesc: 'This will delete all saved entries (cannot be undone). Are you sure?',
     confirmCancel: 'Cancel', confirmDelete: '🗑 Clear all',
     toastDeleted: '1 entry deleted.', toastUndo: '↩️ Undo',
-    simSuccess: 'SUCCESS!', simFail: 'FAILED',
-    simSuccessSub: 'Hit the {n}% chance', simFailSub: 'Missed the {n}% chance', simCloseHint: 'Tap to close',
     confBadgeHigh: '✅ Reliable', confBadgeMid: '🟡 Fair', confBadgeLow: '🔴 Low data',
     rateBadgeHigh: '🔥 High rate', rateBadgeMid: '⚡ Medium rate', rateBadgeLow: '⚠️ Low rate',
     verdictHighText: '🔥 HIGH rate! This bait chain looks great — worth considering. ({n}% vs base rate)',
@@ -1412,7 +1397,7 @@ const STRINGS = {
     digitEffectNote: 'Green bar = this bait raises the actual success rate vs baseline; red = lowers it. More data means more reliable numbers.',
     explainBase: 'Base rate',
     explainBait: 'Bait {d} × {n}',
-    explainReset: '🔁 A "1" bait reset the prior accumulation',
+    explainReset: '🔁 Bait 1 (resets combo, still adds a base bonus)',
     explainDampen: '📉 High level → 2/3 bait effect reduced to {pct}%',
     explainTailMatch: '🧩 Matched tail pattern "{p}"',
     explainTotal: 'Estimate',
@@ -1776,16 +1761,21 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
   document.getElementById('confirmOverlay').classList.remove('show');
 });
 
-saveBtn.addEventListener('click', () => {
+function saveEntry(result) {
   if (!currentResult) return;
   const id = Date.now() + '-' + Math.random().toString(36).slice(2, 7);
   const profile = getCurrentProfile();
-  history.push({ id, target: currentResult.target, rate: currentResult.rate, chain: currentResult.chain, note: noteInput.value.trim(), ts: Date.now(), result: null, owner: profile ? profile.email : null });
+  history.push({ id, target: currentResult.target, rate: currentResult.rate, chain: currentResult.chain, note: noteInput.value.trim(), ts: Date.now(), result, owner: profile ? profile.email : null });
   if (history.length > 80) history = history.slice(-80);
   noteInput.value = '';
   persistHistory(); renderHistory(); refreshAnalytics();
-  vibrate(30);
-});
+  vibrate(result === 'success' ? [40, 30, 40] : result === 'fail' ? [80, 40, 80] : 30);
+  if (result === 'success') { playTone(1046, 0.2, 'sine', 0.13); setTimeout(() => playTone(1568, 0.18, 'sine', 0.1), 90); }
+  else if (result === 'fail') { playTone(180, 0.3, 'sawtooth', 0.13); }
+}
+saveBtn.addEventListener('click', () => saveEntry(null));
+document.getElementById('saveUpBtn').addEventListener('click', () => saveEntry('success'));
+document.getElementById('saveDownBtn').addEventListener('click', () => saveEntry('fail'));
 
 document.getElementById('filterLevel').addEventListener('change', (e) => { filterLevel = e.target.value; renderHistory(); });
 document.getElementById('filterResult').addEventListener('change', (e) => { filterResult = e.target.value; renderHistory(); });
@@ -1970,27 +1960,6 @@ function renderChart() {
       <span><span class="legend-dot" style="background:#e05b5b;"></span> ${t('legendFail')}</span>
     </div>`;
 }
-
-/* ===== Mô phỏng nâng cấp ===== */
-function showSimResult(success, rate) {
-  const overlay = document.getElementById('simOverlay');
-  overlay.className = 'sim-overlay ' + (success ? 'sim-success' : 'sim-fail') + ' show';
-  overlay.innerHTML = success
-    ? `<div class="sim-emoji">🎉</div><div class="sim-text">${t('simSuccess')}</div><div class="sim-sub">${t('simSuccessSub', { n: rate.toFixed(1) })}</div><div class="sim-close-hint">${t('simCloseHint')}</div>`
-    : `<div class="sim-emoji">💥</div><div class="sim-text">${t('simFail')}</div><div class="sim-sub">${t('simFailSub', { n: rate.toFixed(1) })}</div><div class="sim-close-hint">${t('simCloseHint')}</div>`;
-  clearTimeout(overlay._timer);
-  overlay._timer = setTimeout(() => overlay.classList.remove('show'), 2400);
-}
-document.getElementById('simOverlay').addEventListener('click', function () { this.classList.remove('show'); });
-simulateBtn.addEventListener('click', () => {
-  if (!currentResult) return;
-  const roll = Math.random() * 100;
-  const success = roll < currentResult.rate;
-  showSimResult(success, currentResult.rate);
-  vibrate(success ? [50] : [80, 40, 80]);
-  if (success) { playTone(1046, 0.22, 'sine', 0.15); setTimeout(() => playTone(1568, 0.2, 'sine', 0.12), 100); }
-  else { playTone(180, 0.35, 'sawtooth', 0.15); }
-});
 
 /* ===== Khởi tạo chung ===== */
 /* ===== Tự học hệ số công thức từ lịch sử đã đánh dấu ===== */
@@ -2524,9 +2493,13 @@ function evaluateDynamicChain(fullChain, target) {
   const resetOccurred = lastReset !== -1;
   const activeChain = resetOccurred ? fullChain.slice(lastReset + 1) : fullChain;
   const logs = [];
-  if (resetOccurred) logs.push(`🔁 Mồi "1" ở vị trí ${lastReset + 1} → reset tích lũy, chỉ tính từ sau đó.`);
-  if (dampen < 1) logs.push(`📉 Cấp +${target} khó đập hơn → hiệu ứng tăng của mồi 2/3 còn ${(dampen * 100).toFixed(0)}%.`);
   let gainSum = 0, lossSum = 0, streak = 0;
+  if (resetOccurred) {
+    const resetBonus = RESET_BASE_GAIN * dampen;
+    gainSum += resetBonus;
+    logs.push(`🔁 Mồi "1" ở vị trí ${lastReset + 1} → reset tích lũy, nhưng vẫn cộng nền +${resetBonus.toFixed(1)}% cho phần sau.`);
+  }
+  if (dampen < 1) logs.push(`📉 Cấp +${target} khó đập hơn → hiệu ứng tăng của mồi 1/2/3/4 còn ${(dampen * 100).toFixed(0)}%.`);
   const digitBreakdown = [];
   for (const ch of activeChain) {
     const v = Number(ch);
@@ -2537,8 +2510,10 @@ function evaluateDynamicChain(fullChain, target) {
       logs.push(`Mồi ${v}: +${gain.toFixed(1)}% (combo x${streak}${dampen < 1 ? `, đã giảm theo cấp` : ''})`);
       digitBreakdown.push({ digit: v, effect: gain });
     } else if (v === 4) {
-      logs.push(`Mồi 4: +0% (giữ nguyên)`);
-      digitBreakdown.push({ digit: 4, effect: 0 });
+      const gain4 = FOUR_BASE_GAIN * dampen;
+      gainSum += gain4;
+      logs.push(`Mồi 4: +${gain4.toFixed(1)}% (giữ nhịp, vẫn cộng nhẹ)`);
+      digitBreakdown.push({ digit: 4, effect: gain4 });
     } else if (v >= 5) {
       const loss = v === 5 ? PENALTY_5 : PENALTY_5 * 1.5;
       lossSum += loss; streak = 0;
@@ -2588,7 +2563,7 @@ function calculate() {
     renderConfidenceBox(target);
     lastRate = null; wasHigh = false;
     currentResult = null;
-    saveBtn.disabled = true; simulateBtn.disabled = true;
+    saveBtn.disabled = true; document.getElementById('saveUpBtn').disabled = true; document.getElementById('saveDownBtn').disabled = true;
     renderHero();
     return;
   }
@@ -2616,7 +2591,7 @@ function calculate() {
   wasHigh = finalRate >= 60;
 
   currentResult = { target, rate: finalRate, chain: fullChain };
-  saveBtn.disabled = false; simulateBtn.disabled = false;
+  saveBtn.disabled = false; document.getElementById('saveUpBtn').disabled = false; document.getElementById('saveDownBtn').disabled = false;
 
   let confBadge;
   if (dyn.activeChain.length >= 6 || tail.match) confBadge = ['badge-green', t('confBadgeHigh')];
@@ -2655,7 +2630,7 @@ function calculate() {
 
 function renderExplainPanel(baseRate, dyn, tail, totalAdjust, finalRate) {
   const box = document.getElementById('detailLogs');
-  if (!dyn.activeChain.length && !tail.match) {
+  if (!dyn.activeChain.length && !tail.match && !dyn.resetOccurred) {
     box.innerHTML = `<p class="note">${t('noAdjust')}</p>`;
     return;
   }
@@ -2673,7 +2648,9 @@ function renderExplainPanel(baseRate, dyn, tail, totalAdjust, finalRate) {
     const g = grouped[digit];
     rows.push({ label: t('explainBait', { d: digit, n: g.count }), value: g.sum });
   });
-  if (dyn.resetOccurred) rows.push({ label: t('explainReset'), value: null });
+  if (dyn.resetOccurred) {
+    rows.push({ label: t('explainReset'), value: RESET_BASE_GAIN * dyn.dampen });
+  }
   if (dyn.dampen < 1) rows.push({ label: t('explainDampen', { pct: (dyn.dampen * 100).toFixed(0) }), value: null });
   if (tail.match) rows.push({ label: t('explainTailMatch', { p: tail.match.text }), value: tail.bonus });
 
